@@ -1,0 +1,25 @@
+{
+  "name": "ngraph-lmdb",
+  "version": "0.0.1",
+  "description": "Experiment using the insanely fast lmdb as persistence store to the great ngraph core",
+  "main": "index.js",
+  "scripts": {
+    "test": "test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://htaox:logan0716@github.com/htaox/ngraph-lmdb.git"
+  },
+  "keywords": [
+    "ngraph",
+    "lmdb",
+    "in-memory",
+    "graphdb"
+  ],
+  "author": "Henry Tao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/htaox/ngraph-lmdb/issues"
+  },
+  "homepage": "https://github.com/htaox/ngraph-lmdb"
+}
