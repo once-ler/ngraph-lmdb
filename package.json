@@ -21,5 +21,9 @@
   "bugs": {
     "url": "https://github.com/htaox/ngraph-lmdb/issues"
   },
-  "homepage": "https://github.com/htaox/ngraph-lmdb"
+  "homepage": "https://github.com/htaox/ngraph-lmdb",
+  "dependencies": {
+    "ngraph.graph": "0.0.3",
+    "node-lmdb": "0.2.2"
+  }
 }
