@@ -202,5 +202,6 @@ module.exports = function(config) {
       return null; // no link.
   }
 
+  return ngraph;
 
 }
