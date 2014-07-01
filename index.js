@@ -1,111 +1,8 @@
-function merge_options(obj1,obj2){
-    var obj3 = {};
-    for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
-    for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
-    return obj3;
-}
-
 module.exports = function(config) {
 
-  var lmdb = require('node-lmdb');
   var ngraph = require('ngraph.graph')();
-
-  //lmdb defaults
-  var lmdbConfig = {
-
-    env: {
-        path: process.cwd() + "/mydata",
-        mapSize: 2*1024*1024*1024, // maximum database size
-        maxDbs: 10
-    },
-
-    vertexDb: {
-        name: "test:vertices",
-        create: true // will create if database did not exist
-    },
-
-    edgeDb: {
-        name: "test:edges",
-        create: true // will create if database did not exist
-    },
-
-    historyDb: {
-        name: "test:changes",
-        create: true // will create if database did not exist        
-    },
-
-    multiEdgesDb: {
-        name: "test:multi-edges",
-        create: true // will create if database did not exist        
-    }
-  }
-
-  //lmdb wrapper
-  var lmdbWrap = {
-
-    incrNumber: function(dbi, key){
-        var txn = env.beginTxn();
-        var n = txn.getNumber(dbi, key);
-        n = (!n ? 0 : n);
-        n = ++n;
-        txn.putNumber(dbi, key, n);
-        txn.commit();
-    },
-    decrNumber: function(dbi, key){
-        var txn = env.beginTxn();
-        var n = txn.getNumber(dbi, key);
-        n = (!n ? 0 : n);
-        n = (n == 0 ? 0 : --n); 
-        txn.putNumber(dbi, key, n);
-        txn.commit();
-    },
-    putBinary: function(dbi, key, data){
-        var txn = env.beginTxn();
-        var buffer = new Buffer(typeof data == 'string' ? data : JSON.stringify(data));
-        txn.putBinary(dbi, key, buffer);
-        txn.commit();
-    },
-    getBinary: function(dbi, key){
-        var txn = env.beginTxn();
-        var buffer = txn.getBinary(dbi, key);
-        txn.commit();
-        var r = null;
-        try {
-            if (buffer){
-                r = JSON.parse(buffer.toString());
-            }
-        }catch(e){
-            r = buffer.toString();
-        }
-        return r;
-    },
-    getNumber: function(dbi, key){
-        var txn = env.beginTxn();
-        var n = txn.getNumber(dbi, key);
-        txn.commit();
-        return n ? n : null;
-    },
-    putNumber: function(dbi, key, data){
-        var txn = env.beginTxn();
-        txn.putNumber(dbi, key, data);
-        txn.commit();
-    },
-    delete: function(dbi, key){
-        var txn = env.beginTxn();
-        txn.del(dbi, key);
-        txn.commit();
-    }
-
-  }
-
-  //Merge incoming options
-  lmdbConfig = merge_options(lmdbConfig, config);
-  var env = new lmdb.Env();
-  env.open(lmdbConfig.env);
-  var vertexDb = env.openDbi(lmdbConfig.vertexDb);
-  var edgeDb = env.openDbi(lmdbConfig.edgeDb);
-  var historyDb = env.openDbi(lmdbConfig.historyDb);
-  var multiEdgesDb = env.openDbi(lmdbConfig.multiEdgesDb);
+  var coreObjects = require('./lib/core-objects');
+  var lmdbWrap = require('./lib/lmdbWrap')(config);  
 
   //Override methods
   /**
@@ -119,30 +16,14 @@ module.exports = function(config) {
    *
    * @return {node} The newly added node or node with given id if it already exists.
    */
-  addNode : function (nodeId, data) {
+  ngraph.addNode : function (nodeId, data) {
       if (typeof nodeId === 'undefined') {
           throw new Error('Invalid node identifier');
       }
 
       //enterModification();
       
-      var node = this.getNode(nodeId);
-      
-      if (!node) {
-          // TODO: Should I check for linkConnectionSymbol here?
-          node = new Node(nodeId);
-          //nodesCount++;
-          lmdbWrap.incrNumber(vertexDb,'nodesCount');
-
-          //recordNodeChange(node, 'add');
-      } else {
-          //recordNodeChange(node, 'update');
-      }
-
-      node.data = data;
-
-      //nodes[nodeId] = node;
-      lmdbWrap.putBinary(vertexDb, nodeId, node);
+      var node = lmdbWrap.addNode(nodeId, data);
 
       //exitModification(this);
       return node;
@@ -160,41 +41,9 @@ module.exports = function(config) {
    *
    * @return {link} The newly created link
    */
-  addLink : function (fromId, toId, data) {
-      //enterModification();
-
-      var fromNode = this.getNode(fromId) || this.addNode(fromId);
-      var toNode = this.getNode(toId) || this.addNode(toId);
-
-      var linkId = fromId.toString() + linkConnectionSymbol + toId.toString();
-      //var isMultiEdge = multiEdges.hasOwnProperty(linkId);
-      var isMultiEdge = lmdbWrap.getNumber(multiEdgesDb, linkId);
-      if (isMultiEdge || this.hasLink(fromId, toId)) {
-          if (!isMultiEdge) {
-              //multiEdges[linkId] = 0;
-              lmdbWrap.putNumber(multiEdgesDb, linkId, 0);                    
-          }
-          //linkId += '@' + (++multiEdges[linkId]);
-
-          lmdbWrap.incrNumber(multiEdgesDb,linkId);
-          linkId += '@' + (lmdbWrap.getNumber(multiEdgesDb, linkId));
-      }
-
-      var link = new Link(fromId, toId, data, linkId);
-
-      //links.push(link);
-      lmdbWrap.putBinary(edgeDb, linkId, link);
-
-      // TODO: this is not cool. On large graphs potentially would consume more memory.
-      fromNode.links.push(link);
-      toNode.links.push(link);
-
-      lmdbWrap.putBinary(vertexDb, fromId, fromNode);
-      lmdbWrap.putBinary(vertexDb, toId, toNode);
-
-      //recordLinkChange(link, 'add');
-
-      //exitModification(this);
+  ngraph.addLink : function (fromId, toId, data) {
+      
+      var link = lmdbWrap.addNode(fromId, toId, data);
 
       return link;
 
@@ -207,38 +56,9 @@ module.exports = function(config) {
    *
    * @returns true if link was removed; false otherwise.
    */
-  removeLink : function (link) {
-      if (!link) { return false; }
-      //var idx = indexOfElementInArray(link, links);
-      //if (idx < 0) { return false; }
-
-      var e = lmdbWrap.getBinary(edgeDb, link.id);
-      if (!e){return false;}
-      //enterModification();
-
-      //links.splice(idx, 1);
-      lmdbWrap.delete(edgeDb, link.id);
-
-      var fromNode = this.getNode(link.fromId);
-      var toNode = this.getNode(link.toId);
-
-      if (fromNode) {
-          idx = indexOfElementInArray(link, fromNode.links);
-          if (idx >= 0) {
-              fromNode.links.splice(idx, 1);
-          }
-      }
-
-      if (toNode) {
-          idx = indexOfElementInArray(link, toNode.links);
-          if (idx >= 0) {
-              toNode.links.splice(idx, 1);
-          }
-      }
-
-      //recordLinkChange(link, 'remove');
-
-      //exitModification(this);
+  ngraph.removeLink : function (link) {
+      
+      lmdbWrap.removeLink(link);
 
       return true;
   },
@@ -251,25 +71,9 @@ module.exports = function(config) {
    *
    * @returns true if node was removed; false otherwise.
    */
-  removeNode: function (nodeId) {
-      var node = this.getNode(nodeId);
-      if (!node) { return false; }
-
-      //enterModification();
-
-      while (node.links.length) {
-          var link = node.links[0];
-          this.removeLink(link);
-      }
-
-      //delete nodes[nodeId];
-      lmdbWrap.delete(vertexDb, nodeId);
-      //nodesCount--;
-      lmdbWrap.decrNumber(vertexDb, 'nodesCount');
-
-      //recordNodeChange(node, 'remove');
-
-      //exitModification(this);
+  ngraph.removeNode: function (nodeId) {
+      
+      lmdbWrap.removeNode(nodeId);
 
       return true;
   },
@@ -281,9 +85,8 @@ module.exports = function(config) {
    *
    * @return {node} in with requested identifier or undefined if no such node exists.
    */
-  getNode : function (nodeId, callback) {
-      return lmdbWrap.getBinary(vertexDb, nodeId);
-      //return nodes[nodeId];
+  ngraph.getNode : function (nodeId, callback) {
+      return lmdbWrap.getNode(nodeId, callback);
   },
 
   /**
@@ -291,16 +94,16 @@ module.exports = function(config) {
    *
    * @return number of nodes in the graph.
    */
-  getNodesCount : function () {
-      return lmdbWrap.getNumber(vertexDb, 'nodesCount');
+  ngraph.getNodesCount : function () {
+      return lmdbWrap.getNodesCount();
       //return nodesCount;
   },
 
   /**
    * Gets total number of links in the graph.
    */
-  getLinksCount : function () {
-      return lmdbWrap.getNumber(edgeDb, 'linksCount');
+  ngraph.getLinksCount : function () {
+      return lmdbWrap.getLinksCount();
       //return links.length;
   },
 
@@ -313,10 +116,9 @@ module.exports = function(config) {
    * @return Array of links from and to requested node if such node exists;
    *   otherwise null is returned.
    */
-  getLinks : function (nodeId) {
+  ngraph.getLinks : function (nodeId) {
       
-      var node = this.getNode(nodeId);
-      return node ? node.links : null;            
+      return lmdbWrap.getLinks(nodeId);            
   },
 
   /**
@@ -325,35 +127,7 @@ module.exports = function(config) {
    * @param {Function(node)} callback Function to be invoked. The function
    *   is passed one argument: visited node.
    */
-  forEachNode : function (callback) {
-      if (typeof callback !== 'function') {
-          return;
-      }
-      /*
-      var node;
-
-      for (node in nodes) {
-          if (callback(nodes[node])) {
-              return; // client doesn't want to proceed. return.
-          }
-      }
-      */
-      var txn = env.beginTxn();
-      var cursor = new lmdb.Cursor(txn, vertexDb);
-      for (var found = cursor.goToFirst(); found; found = cursor.goToNext()) {
-          cursor.getCurrentBinary(function(key,buffer){
-              var d = JSON.parse(buffer.toString());
-              if (callback(d)){
-                  cursor.close();
-                  txn.commit();
-                  return;
-              }
-          });
-      }
-      cursor.close();
-      txn.commit();
-
-  },
+  ngraph.forEachNode : lmdbWrap.forEachNode,
 
   /**
    * Invokes callback on every linked (adjacent) node to the given one.
@@ -363,31 +137,7 @@ module.exports = function(config) {
    *   The function is passed two parameters: adjacent node and link object itself.
    * @param oriented if true graph treated as oriented.
    */
-  forEachLinkedNode : function (nodeId, callback, oriented) {
-      var node = this.getNode(nodeId),
-          i,
-          link,
-          linkedNodeId;
-
-      if (node && node.links && typeof callback === 'function') {
-          // Extraced orientation check out of the loop to increase performance
-          if (oriented) {
-              for (i = 0; i < node.links.length; ++i) {
-                  link = node.links[i];
-                  if (link.fromId === nodeId) {
-                      callback(nodes[link.toId], link);
-                  }
-              }
-          } else {
-              for (i = 0; i < node.links.length; ++i) {
-                  link = node.links[i];
-                  linkedNodeId = link.fromId === nodeId ? link.toId : link.fromId;
-
-                  callback(nodes[linkedNodeId], link);
-              }
-          }
-      }
-  },
+  ngraph.forEachLinkedNode : lmdbWrap.forEachLinkedNode,
 
   /**
    * Enumerates all links in the graph
@@ -400,33 +150,13 @@ module.exports = function(config) {
    *  toId - node id where link ends,
    *  data - additional data passed to graph.addLink() method.
    */
-  forEachLink : function (callback) {
-      var i, length;
-      if (typeof callback === 'function') {
-          /*
-          for (i = 0, length = links.length; i < length; ++i) {
-              callback(links[i]);
-          }
-          */
-          var txn = env.beginTxn();
-          var cursor = new lmdb.Cursor(txn, edgeDb);
-          for (var found = cursor.goToFirst(); found; found = cursor.goToNext()) {
-              cursor.getCurrentBinary(function(key,buffer){
-                  var d = JSON.parse(buffer.toString());
-                  callback(d);
-              });
-          }
-          cursor.close();
-          txn.commit();
-
-      }
-  },
+  ngraph.forEachLink : lmdbWrap.forEachLink,
 
   /**
    * Suspend all notifications about graph changes until
    * endUpdate is called.
    */
-  beginUpdate : function () {
+  ngraph.beginUpdate : function () {
       //enterModification();
   },
 
@@ -434,14 +164,14 @@ module.exports = function(config) {
    * Resumes all notifications about graph changes and fires
    * graph 'changed' event in case there are any pending changes.
    */
-  endUpdate : function () {
+  ngraph.endUpdate : function () {
       //exitModification(this);
   },
 
   /**
    * Removes all nodes and links from the graph.
    */
-  clear : function () {
+  ngraph.clear : function () {
       var that = this;
       //that.beginUpdate();
       that.forEachNode(function (node) { that.removeNode(node.id); });
@@ -454,7 +184,7 @@ module.exports = function(config) {
    *
    * @returns link if there is one. null otherwise.
    */
-  hasLink : function (fromNodeId, toNodeId) {
+  ngraph.hasLink : function (fromNodeId, toNodeId) {
       // TODO: Use adjacency matrix to speed up this operation.
       var node = this.getNode(fromNodeId),
           i;
