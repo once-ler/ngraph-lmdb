@@ -2,7 +2,7 @@ module.exports = function(config) {
 
   var ngraph = require('ngraph.graph')();
   var coreObjects = require('./lib/core-objects');
-  var lmdbWrap = require('./lib/lmdbWrap')(config);  
+  var lmdbWrap = require('./lib/lmdb-wrap')(config);  
 
   //Override methods
   /**
