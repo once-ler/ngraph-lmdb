@@ -16,7 +16,7 @@ module.exports = function(config) {
    *
    * @return {node} The newly added node or node with given id if it already exists.
    */
-  ngraph.addNode : function (nodeId, data) {
+  ngraph.addNode = function (nodeId, data) {
       if (typeof nodeId === 'undefined') {
           throw new Error('Invalid node identifier');
       }
@@ -41,7 +41,7 @@ module.exports = function(config) {
    *
    * @return {link} The newly created link
    */
-  ngraph.addLink : function (fromId, toId, data) {
+  ngraph.addLink = function (fromId, toId, data) {
       
       var link = lmdbWrap.addNode(fromId, toId, data);
 
@@ -56,7 +56,7 @@ module.exports = function(config) {
    *
    * @returns true if link was removed; false otherwise.
    */
-  ngraph.removeLink : function (link) {
+  ngraph.removeLink = function (link) {
       
       lmdbWrap.removeLink(link);
 
@@ -71,7 +71,7 @@ module.exports = function(config) {
    *
    * @returns true if node was removed; false otherwise.
    */
-  ngraph.removeNode: function (nodeId) {
+  ngraph.removeNode = function (nodeId) {
       
       lmdbWrap.removeNode(nodeId);
 
@@ -85,7 +85,7 @@ module.exports = function(config) {
    *
    * @return {node} in with requested identifier or undefined if no such node exists.
    */
-  ngraph.getNode : function (nodeId, callback) {
+  ngraph.getNode = function (nodeId, callback) {
       return lmdbWrap.getNode(nodeId, callback);
   },
 
@@ -94,7 +94,7 @@ module.exports = function(config) {
    *
    * @return number of nodes in the graph.
    */
-  ngraph.getNodesCount : function () {
+  ngraph.getNodesCount = function () {
       return lmdbWrap.getNodesCount();
       //return nodesCount;
   },
@@ -102,7 +102,7 @@ module.exports = function(config) {
   /**
    * Gets total number of links in the graph.
    */
-  ngraph.getLinksCount : function () {
+  ngraph.getLinksCount = function () {
       return lmdbWrap.getLinksCount();
       //return links.length;
   },
@@ -116,7 +116,7 @@ module.exports = function(config) {
    * @return Array of links from and to requested node if such node exists;
    *   otherwise null is returned.
    */
-  ngraph.getLinks : function (nodeId) {
+  ngraph.getLinks = function (nodeId) {
       
       return lmdbWrap.getLinks(nodeId);            
   },
@@ -127,7 +127,7 @@ module.exports = function(config) {
    * @param {Function(node)} callback Function to be invoked. The function
    *   is passed one argument: visited node.
    */
-  ngraph.forEachNode : lmdbWrap.forEachNode,
+  ngraph.forEachNode = lmdbWrap.forEachNode,
 
   /**
    * Invokes callback on every linked (adjacent) node to the given one.
@@ -137,7 +137,7 @@ module.exports = function(config) {
    *   The function is passed two parameters: adjacent node and link object itself.
    * @param oriented if true graph treated as oriented.
    */
-  ngraph.forEachLinkedNode : lmdbWrap.forEachLinkedNode,
+  ngraph.forEachLinkedNode = lmdbWrap.forEachLinkedNode,
 
   /**
    * Enumerates all links in the graph
@@ -150,13 +150,13 @@ module.exports = function(config) {
    *  toId - node id where link ends,
    *  data - additional data passed to graph.addLink() method.
    */
-  ngraph.forEachLink : lmdbWrap.forEachLink,
+  ngraph.forEachLink = lmdbWrap.forEachLink,
 
   /**
    * Suspend all notifications about graph changes until
    * endUpdate is called.
    */
-  ngraph.beginUpdate : function () {
+  ngraph.beginUpdate = function () {
       //enterModification();
   },
 
@@ -164,14 +164,14 @@ module.exports = function(config) {
    * Resumes all notifications about graph changes and fires
    * graph 'changed' event in case there are any pending changes.
    */
-  ngraph.endUpdate : function () {
+  ngraph.endUpdate = function () {
       //exitModification(this);
   },
 
   /**
    * Removes all nodes and links from the graph.
    */
-  ngraph.clear : function () {
+  ngraph.clear = function () {
       var that = this;
       //that.beginUpdate();
       that.forEachNode(function (node) { that.removeNode(node.id); });
@@ -184,7 +184,7 @@ module.exports = function(config) {
    *
    * @returns link if there is one. null otherwise.
    */
-  ngraph.hasLink : function (fromNodeId, toNodeId) {
+  ngraph.hasLink = function (fromNodeId, toNodeId) {
       // TODO: Use adjacency matrix to speed up this operation.
       var node = this.getNode(fromNodeId),
           i;
