@@ -43,7 +43,7 @@ module.exports = function(config) {
    */
   ngraph.addLink = function (fromId, toId, data) {
       
-      var link = lmdbWrap.addNode(fromId, toId, data);
+      var link = lmdbWrap.addLink(fromId, toId, data);
 
       return link;
 
@@ -171,12 +171,7 @@ module.exports = function(config) {
   /**
    * Removes all nodes and links from the graph.
    */
-  ngraph.clear = function () {
-      var that = this;
-      //that.beginUpdate();
-      that.forEachNode(function (node) { that.removeNode(node.id); });
-      //that.endUpdate();
-  },
+  ngraph.clear = lmdbWrap.clear,
 
   /**
    * Detects whether there is a link between two nodes.
@@ -184,23 +179,7 @@ module.exports = function(config) {
    *
    * @returns link if there is one. null otherwise.
    */
-  ngraph.hasLink = function (fromNodeId, toNodeId) {
-      // TODO: Use adjacency matrix to speed up this operation.
-      var node = this.getNode(fromNodeId),
-          i;
-      if (!node) {
-          return null;
-      }
-
-      for (i = 0; i < node.links.length; ++i) {
-          var link = node.links[i];
-          if (link.fromId === fromNodeId && link.toId === toNodeId) {
-              return link;
-          }
-      }
-
-      return null; // no link.
-  }
+  ngraph.hasLink = lmdbWrap.hasLink;
 
   return ngraph;
 
