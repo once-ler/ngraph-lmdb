@@ -25,6 +25,6 @@
   "dependencies": {
     "ngraph.graph": "0.0.3",
     "node-lmdb": "0.2.2",
-    "lmdb": "^0.2.0"
+    "level-lmdb": "^0.17.0"
   }
 }
