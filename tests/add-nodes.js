@@ -1,6 +1,6 @@
 var g = require('../index')();
 
-var count = 10000; //100K
+var count = 100000; //100K
 
 //Create nodes
 var time = process.hrtime(); 
