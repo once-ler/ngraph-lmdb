@@ -1,7 +1,6 @@
 module.exports = function(config) {
 
   var ngraph = require('ngraph.graph')();
-  var coreObjects = require('./lib/core-objects');
   var lmdbWrap = require('./lib/lmdb-wrap')(config);  
 
   //Override methods
@@ -16,18 +15,16 @@ module.exports = function(config) {
    *
    * @return {node} The newly added node or node with given id if it already exists.
    */
-  ngraph.addNode = function (nodeId, data) {
+  ngraph.addNode = function (nodeId, data, callback) {
       if (typeof nodeId === 'undefined') {
           throw new Error('Invalid node identifier');
       }
 
       //enterModification();
       
-      var node = lmdbWrap.addNode(nodeId, data);
-
       //exitModification(this);
-      return node;
-                  
+      //return lmdbWrap.addNode(nodeId, data, callback);                  
+      return lmdbWrap.addNode.apply(this, arguments);
   },
 
   /**
@@ -41,12 +38,9 @@ module.exports = function(config) {
    *
    * @return {link} The newly created link
    */
-  ngraph.addLink = function (fromId, toId, data) {
+  ngraph.addLink = function (fromId, toId, data, callback) {
       
-      var link = lmdbWrap.addLink(fromId, toId, data);
-
-      return link;
-
+    return lmdbWrap.addLink.apply(this, arguments);
   },
 
   /**
@@ -56,11 +50,9 @@ module.exports = function(config) {
    *
    * @returns true if link was removed; false otherwise.
    */
-  ngraph.removeLink = function (link) {
+  ngraph.removeLink = function (link, callback) {
       
-      lmdbWrap.removeLink(link);
-
-      return true;
+    return lmdbWrap.removeLink.apply(this, arguments);
   },
 
   /**
@@ -71,11 +63,9 @@ module.exports = function(config) {
    *
    * @returns true if node was removed; false otherwise.
    */
-  ngraph.removeNode = function (nodeId) {
+  ngraph.removeNode = function (nodeId, callback) {
       
-      lmdbWrap.removeNode(nodeId);
-
-      return true;
+    return lmdbWrap.removeNode.apply(this, arguments);
   },
 
   /**
@@ -86,7 +76,7 @@ module.exports = function(config) {
    * @return {node} in with requested identifier or undefined if no such node exists.
    */
   ngraph.getNode = function (nodeId, callback) {
-      return lmdbWrap.getNode(nodeId, callback);
+    return lmdbWrap.getNode.apply(this, arguments);
   },
 
   /**
@@ -94,17 +84,15 @@ module.exports = function(config) {
    *
    * @return number of nodes in the graph.
    */
-  ngraph.getNodesCount = function () {
-      return lmdbWrap.getNodesCount();
-      //return nodesCount;
+  ngraph.getNodesCount = function (callback) {
+    return lmdbWrap.getNodesCount.apply(this, arguments);
   },
 
   /**
    * Gets total number of links in the graph.
    */
-  ngraph.getLinksCount = function () {
-      return lmdbWrap.getLinksCount();
-      //return links.length;
+  ngraph.getLinksCount = function (callback) {
+    return lmdbWrap.getLinksCount.apply(this, arguments);
   },
 
   /**
@@ -116,9 +104,8 @@ module.exports = function(config) {
    * @return Array of links from and to requested node if such node exists;
    *   otherwise null is returned.
    */
-  ngraph.getLinks = function (nodeId) {
-      
-      return lmdbWrap.getLinks(nodeId);            
+  ngraph.getLinks = function (nodeId, callback) {      
+    return lmdbWrap.getLinks.apply(this, arguments);           
   },
 
   /**

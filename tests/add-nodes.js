@@ -1,6 +1,6 @@
 var g = require('../index')();
 
-var count = 100000; //100K
+var count = 1000; //10K
 
 //Create nodes
 var time = process.hrtime(); 
@@ -16,3 +16,5 @@ for(var i=0; i < count;i++){
     g.addLink(i+'', n+'', 'knows');
   }
 }
+
+//wget https://raw.githubusercontent.com/rvagg/node-leveldown/master/bench/write-random.js
