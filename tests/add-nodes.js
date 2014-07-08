@@ -13,7 +13,7 @@ for(var i=0; i < count;i++){
 
 //Create links
 for(var i=0; i < count;i++){  
-  for (var j=0; j < 7;j++){
+  for (var j=0; j < 10;j++){
     var n = Math.floor((Math.random() * count));
     g.addLink(i+'', n+'', 'knows');
   }
@@ -28,11 +28,13 @@ var time = process.hrtime();
 async.eachSeries([0,1,2,3,4,5,6,7,8,9,10], function(q, callback){ 
   async.each(puts, function(d, next){
 
-    async.each([0,1,2,3,4,5,7],function(e,cb){
+    async.each([0,1,2,3,4,5,7,8,9,10],function(e,cb){
       var n = Math.floor((Math.random() * count));
       g.addLink(i+'', n+'', 'knows', cb);
     },function(err){
-      next();
+      console.log(d);
+      process.nextTick(next);
+      //next();
     })
   }, function(err){
     callback();
