@@ -24,24 +24,21 @@ module.exports = function(config) {
 
     edgeDb: {
         name: "test:edges",
-        create: true,
-        dupSort: true
-    },
-
-    inEdgeDb: {
-        name: "test:in-edges",
-        create: true,
-        dupSort: true
-    },
-
-    outEdgeDb: {
-        name: "test:out-edges",
-        create: true,
-        dupSort: true
+        create: true // will create if database did not exist
     },
 
     statsDb: {
         name: "test:stats",
+        create: true // will create if database did not exist
+    },
+
+    multiEdgesDb: {
+        name: "test:multi-edges",
+        create: true // will create if database did not exist
+    },
+
+    matrixDb: {
+        name: "test:matrix",
         create: true // will create if database did not exist
     }
 
@@ -65,7 +62,8 @@ module.exports = function(config) {
         n = (n == 0 ? 0 : --n); 
         txn.putNumber(dbi, key, n);
         txn.commit();
-    },    
+    },
+    
     putBinary: function(dbi, key, data){
         var txn = env.beginTxn();
         var buffer = new Buffer(typeof data == 'string' ? data : JSON.stringify(data));
@@ -86,6 +84,7 @@ module.exports = function(config) {
         }
         return r;
     },
+    
     putString: function(dbi, key, data){
         var txn = env.beginTxn();
         var value = typeof data == 'string' ? data : JSON.stringify(data);
@@ -117,13 +116,14 @@ module.exports = function(config) {
     },
     delete: function(dbi, key){
         var txn = env.beginTxn();
-        var buffer = txn.getBinary(dbi, key);
-        if (buffer){
-          txn.del(dbi, key);          
-        }
+        txn.del(dbi, key);
         txn.commit();
     }
+
   }
+
+  //lmdbWrap.putBinary = lmdbWrap.putString;
+  //lmdbWrap.getBinary = lmdbWrap.getString;
 
   //Merge incoming options
   lmdbConfig = coreObjects.mergeOptions(lmdbConfig, config);
@@ -136,27 +136,18 @@ module.exports = function(config) {
   env.open(lmdbConfig.env);
   var vertexDb = env.openDbi(lmdbConfig.vertexDb);
   var edgeDb = env.openDbi(lmdbConfig.edgeDb);
-  var inEdgeDb = env.openDbi(lmdbConfig.inEdgeDb);
-  var outEdgeDb = env.openDbi(lmdbConfig.outEdgeDb);
-  var edges = {
-    "both": edgeDb,
-    "in": inEdgeDb,
-    "out": outEdgeDb
-  };
+  var multiEdgesDb = env.openDbi(lmdbConfig.multiEdgesDb);
   var statsDb = env.openDbi(lmdbConfig.statsDb);
-  
+  var matrixDb = env.openDbi(lmdbConfig.matrixDb);
+  var linkConnectionSymbol = '->';
+
   //Private
   var dispose = function(dbi) {
 
     var txn = env.beginTxn();
     var cursor = new lmdb.Cursor(txn, dbi);
     for (var found = cursor.goToFirst(); found; found = cursor.goToNext()) {
-      try{
         cursor.del();
-      }
-      catch(e){
-
-      }
     }
     cursor.close();
     txn.commit();
@@ -164,31 +155,69 @@ module.exports = function(config) {
 
   var getNode = function (nodeId, callback) {
     return lmdbWrap.getBinary(vertexDb, nodeId);
+    //return nodes[nodeId];
   };
 
-  var removeLink= function (nodeId) {
+  var removeLink2 = function (link) {
 
-    if (!nodeId) { return false; }
-    
-    lmdbWrap.delete(edgeDb, nodeId);
-    lmdbWrap.delete(inEdgeDb, nodeId);
-    lmdbWrap.delete(outEdgeDb, nodeId);
+    if (!link) { return false; }
+    //var idx = indexOfElementInArray(link, links);
+    //if (idx < 0) { return false; }
 
-    return true;
-  };
+    var e = lmdbWrap.getBinary(edgeDb, link.id);
+    if (!e){return false;}
+    //enterModification();
 
-  var removeNode = function (nodeId) {
-    var node = getNode(nodeId);
-    if (!node) { return false; }
+    //links.splice(idx, 1);
+    lmdbWrap.delete(edgeDb, link.id);
+    lmdbWrap.decrNumber(statsDb,'linksCount');
 
-    //Remove all links associated with this node
-    removeLink(nodeId);
+    var fromList = lmdbWrap.getBinary(matrixDb, link.fromId);
+    delete fromList[link.id];
+    lmdbWrap.putBinary(matrixDb, link.fromId, fromList);
 
-    lmdbWrap.delete(vertexDb, nodeId);
-    lmdbWrap.decrNumber(statsDb, 'nodesCount');
-
-    return true;
+    var toList = lmdbWrap.getBinary(matrixDb, link.toId);
+    delete toList[link.id];
+    lmdbWrap.putBinary(matrixDb, link.toId, toList);
   }
+
+  var removeLink= function (link) {
+
+    if (!link) { return false; }
+    //var idx = indexOfElementInArray(link, links);
+    //if (idx < 0) { return false; }
+
+    var e = lmdbWrap.getBinary(edgeDb, link.id);
+    if (!e){return false;}
+    //enterModification();
+
+    //links.splice(idx, 1);
+    lmdbWrap.delete(edgeDb, link.id);
+    lmdbWrap.decrNumber(statsDb,'linksCount');
+
+    var fromNode = getNode(link.fromId);
+    var toNode = getNode(link.toId);
+
+    if (fromNode) {
+      idx = coreObjects.indexOfElementInArray(link, fromNode.links);
+      if (idx >= 0) {
+          fromNode.links.splice(idx, 1);
+      }
+    }
+
+    if (toNode) {
+      idx = coreObjects.indexOfElementInArray(link, toNode.links);
+      if (idx >= 0) {
+          toNode.links.splice(idx, 1);
+      }
+    }
+
+    //recordLinkChange(link, 'remove');
+
+    //exitModification(this);
+
+    return true;
+  };
 
   var hasLink = function (fromNodeId, toNodeId) {
     // TODO: Use adjacency matrix to speed up this operation.
@@ -213,65 +242,100 @@ module.exports = function(config) {
     var node = getNode(nodeId);
     
     if (!node) {
-      node = new coreObjects.Node(nodeId);
-      lmdbWrap.incrNumber(statsDb,'nodesCount');
+        // TODO: Should I check for linkConnectionSymbol here?
+        node = new coreObjects.Node(nodeId);
+        //nodesCount++;
+        lmdbWrap.incrNumber(statsDb,'nodesCount');
+
+        //recordNodeChange(node, 'add');
+    } else {
+        //recordNodeChange(node, 'update');
     }
 
     node.data = data;
 
+    //nodes[nodeId] = node;
     lmdbWrap.putBinary(vertexDb, nodeId, node);
     
     return node;
 
   };
 
-  var addLink = function (fromId, toId, label, data) {
-    
-    //Create nodes if not exist
-    var fromNode = addNode(fromId);
-    var toNode = addNode(toId);
+  var addLink2 = function(fromId, toId, data) {
 
-    //Create link keys
-    var linkId = fromId + ':' + label + ':' + toId;
-    
-    var link = new coreObjects.Link(fromId, toId, label, data, linkId);
+    var fromNode = getNode(fromId) || addNode(fromId);
+    var toNode = getNode(toId) || addNode(toId);
 
-    lmdbWrap.putBinary(edgeDb, fromId, link);
-    lmdbWrap.putBinary(edgeDb, toId, link);
-    lmdbWrap.putBinary(inEdgeDb, toId, link);
-    lmdbWrap.putBinary(outEdgeDb, fromId, link);
+    var linkId = fromId + linkConnectionSymbol + toId;
     
+    var isMultiEdge = lmdbWrap.getNumber(multiEdgesDb, linkId);
+    if (!isMultiEdge) {
+      lmdbWrap.putNumber(multiEdgesDb, linkId, 1);
+    }
+    else {                    
+      lmdbWrap.incrNumber(multiEdgesDb,linkId);
+      linkId += '@' + (isMultiEdge);      
+    }
+
+    var link = new coreObjects.Link(fromId, toId, data, linkId);
+
+    var fromList = lmdbWrap.getBinary(matrixDb, fromId);
+    if (!fromList){
+      fromList = {};
+    }
+    fromList[linkId] = link; 
+    lmdbWrap.putBinary(matrixDb, fromId, fromList);
+    
+    var toList = lmdbWrap.getBinary(matrixDb, toId);
+    if (!toList){
+      toList = {};
+    }
+    toList[linkId] = link; 
+    lmdbWrap.putBinary(matrixDb, toId, toList);
+
+    return link;
+  };
+
+  var addLink = function (fromId, toId, data) {
+    //enterModification();
+
+    var fromNode = getNode(fromId) || addNode(fromId);
+    var toNode = getNode(toId) || addNode(toId);
+
+    var linkId = fromId.toString() + linkConnectionSymbol + toId.toString();
+    //var isMultiEdge = multiEdges.hasOwnProperty(linkId);
+    var isMultiEdge = lmdbWrap.getNumber(multiEdgesDb, linkId);
+    if (isMultiEdge || hasLink(fromId, toId)) {
+        if (!isMultiEdge) {
+            //multiEdges[linkId] = 0;
+            lmdbWrap.putNumber(multiEdgesDb, linkId, 0);                    
+        }
+        //linkId += '@' + (++multiEdges[linkId]);
+
+        lmdbWrap.incrNumber(multiEdgesDb,linkId);
+        linkId += '@' + (lmdbWrap.getNumber(multiEdgesDb, linkId));
+    }
+
+    var link = new coreObjects.Link(fromId, toId, data, linkId);
+
+    //links.push(link);
+    lmdbWrap.putBinary(edgeDb, linkId, link);
     lmdbWrap.incrNumber(statsDb,'linksCount');
+
+    // TODO: this is not cool. On large graphs potentially would consume more memory.
+    fromNode.links.push(link);
+    toNode.links.push(link);
+
+    lmdbWrap.putBinary(vertexDb, fromId, fromNode);
+    lmdbWrap.putBinary(vertexDb, toId, toNode);
+
+    //recordLinkChange(link, 'add');
+
+    //exitModification(this);
 
     return link;
 
   };
-
-  var getLinks = function (nodeId, direction) {
-      
-    if(!nodeId){
-      return null;
-    }
-    var links = [];
-
-    var txn = env.beginTxn();
-    var db = edges[direction];
-    var cursor = new lmdb.Cursor(txn, db ? db : edgeDb);
-    for (var found = (cursor.goToRange(nodeId) === nodeId); found; found = cursor.goToNextDup()) {
-      cursor.getCurrentBinary(function(nodeId,buffer){
-        var d = buffer.toString();
-        try{
-          d=JSON.parse(d);
-          links.push(d);
-        }
-        catch(e){}
-      });
-    }
-    cursor.close();
-    txn.abort();
-
-    return links.length > 0 ? links : null;            
-  }
 
   function deepClone(doc) {
     return JSON.parse(JSON.stringify(doc));
@@ -334,25 +398,66 @@ module.exports = function(config) {
 
     removeLink: removeLink,
 
-    removeNode: removeNode,
+    removeNode: function (nodeId) {
+      var node = getNode(nodeId);
+      if (!node) { return false; }
+
+      //enterModification();
+
+      //while (node.links.length) {
+      //    var link = node.links[0];
+      //    this.removeLink(link);
+      //}
+      for(var k in node.links) {
+        var link = node.links[k];
+        removeLink(link);
+      }
+
+      //delete nodes[nodeId];
+      lmdbWrap.delete(vertexDb, nodeId);
+      //nodesCount--;
+      lmdbWrap.decrNumber(statsDb, 'nodesCount');
+
+      //recordNodeChange(node, 'remove');
+
+      //exitModification(this);
+
+      return true;
+    },
 
     getNode : getNode,
 
     getNodesCount : function () {
       return lmdbWrap.getNumber(statsDb, 'nodesCount');
+      //return nodesCount;
     },
 
     getLinksCount : function () {
         return lmdbWrap.getNumber(statsDb, 'linksCount');
+        //return links.length;
     },
 
-    getLinks : getLinks,
+    getLinks : function (nodeId) {
+      
+      var node = getNode(nodeId);
+      return node ? node.links : null;            
+    },
+
+    VertexCursor: VertexCursor,
 
     forEachNode : function (callback) {
       if (typeof callback !== 'function') {
           return;
       }
-      
+      /*
+      var node;
+
+      for (node in nodes) {
+          if (callback(nodes[node])) {
+              return; // client doesn't want to proceed. return.
+          }
+      }
+      */
       var txn = env.beginTxn();
       var cursor = new lmdb.Cursor(txn, vertexDb);
       for (var found = cursor.goToFirst(); found; found = cursor.goToNext()) {
@@ -373,6 +478,27 @@ module.exports = function(config) {
       }
       cursor.close();
       txn.commit();
+
+    },
+
+    forEachLinkedNode2 : function (nodeId, callback) {
+
+      callback = callback || function(){};
+
+      var links = lmdbWrap.getBinary(matrixDb, nodeId);
+
+      if (!links){
+          callback();
+      }
+
+      //for (i = 0; i < node.links.length; ++i) {
+      for(var k in links) {
+
+          link = links[k];
+          linkedNodeId = link.fromId === nodeId ? link.toId : link.fromId;
+          var linkedNode = getNode(linkedNodeId);
+          callback(linkedNode, link);
+      }
 
     },
 
@@ -437,14 +563,16 @@ module.exports = function(config) {
     hasLink: hasLink,
 
     clear: function () {
+        //that.beginUpdate();
         
-        //dispose(vertexDb);
-        //dispose(edgeDb);
-        //dispose(inEdgeDb);
-        //dispose(outEdgeDb);
+        dispose(vertexDb);
         lmdbWrap.putNumber(statsDb, 'nodesCount', 0);
+        dispose(edgeDb);
         lmdbWrap.putNumber(statsDb, 'linksCount', 0);
-        
+        dispose(multiEdgesDb);
+        dispose(matrixDb);
+
+        //that.endUpdate();
     }
 
   }
