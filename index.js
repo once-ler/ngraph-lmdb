@@ -68,6 +68,10 @@ module.exports = function(config) {
     return lmdbWrap.removeNode.apply(this, arguments);
   },
 
+  ngraph.get = function (key, callback) {
+    return lmdbWrap.get.apply(this, arguments);
+  },
+
   /**
    * Gets node with given identifier. If node does not exist undefined value is returned.
    *
