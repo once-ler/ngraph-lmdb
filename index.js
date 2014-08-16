@@ -139,6 +139,8 @@ module.exports = function(config) {
    */
   ngraph.forEachLink = lmdbWrap.forEachLink,
 
+  ngraph.forEachNodeIndex = lmdbWrap.forEachNodeIndex,
+
   /**
    * Suspend all notifications about graph changes until
    * endUpdate is called.
