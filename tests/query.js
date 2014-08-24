@@ -22,11 +22,13 @@ for(var i=0; i < count;i++){
   }
 }
 
-graph.forEachNode(console.log);
+//graph.forEachNode(console.log);
 
-graph.forEachLink(console.log);
+//graph.forEachLink(console.log);
 
-graph.forEachNodeIndex(console.log);
+graph.forEachOutLink(console.log);
+
+//graph.forEachNodeIndex(console.log);
 
 
 

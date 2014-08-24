@@ -139,6 +139,8 @@ module.exports = function(config) {
    */
   ngraph.forEachLink = lmdbWrap.forEachLink,
 
+  ngraph.forEachOutLink = lmdbWrap.forEachOutLink,
+
   ngraph.forEachNodeIndex = lmdbWrap.forEachNodeIndex,
 
   /**
