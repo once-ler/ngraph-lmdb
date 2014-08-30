@@ -1,0 +1,224 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install' ]
+2 info using npm@1.3.21
+3 info using node@v0.10.24
+4 verbose readDependencies using package.json deps
+5 verbose install where, deps [ 'C:\\cygwin64\\home\\htao\\ngraph-lmdb',
+5 verbose install   [ 'ngraph.graph',
+5 verbose install     'node-lmdb',
+5 verbose install     'async',
+5 verbose install     'ngraph.shremlin',
+5 verbose install     'underscore',
+5 verbose install     'tap' ] ]
+6 info preinstall ngraph-lmdb@0.0.1
+7 verbose readDependencies using package.json deps
+8 verbose already installed skipping ngraph.graph@0.0.3 C:\cygwin64\home\htao\ngraph-lmdb
+9 verbose cache add [ 'node-lmdb@0.2.2', null ]
+10 verbose cache add name=undefined spec="node-lmdb@0.2.2" args=["node-lmdb@0.2.2",null]
+11 verbose parsed url { protocol: null,
+11 verbose parsed url   slashes: null,
+11 verbose parsed url   auth: null,
+11 verbose parsed url   host: null,
+11 verbose parsed url   port: null,
+11 verbose parsed url   hostname: null,
+11 verbose parsed url   hash: null,
+11 verbose parsed url   search: null,
+11 verbose parsed url   query: null,
+11 verbose parsed url   pathname: 'node-lmdb@0.2.2',
+11 verbose parsed url   path: 'node-lmdb@0.2.2',
+11 verbose parsed url   href: 'node-lmdb@0.2.2' }
+12 verbose cache add name="node-lmdb" spec="0.2.2" args=["node-lmdb","0.2.2"]
+13 verbose parsed url { protocol: null,
+13 verbose parsed url   slashes: null,
+13 verbose parsed url   auth: null,
+13 verbose parsed url   host: null,
+13 verbose parsed url   port: null,
+13 verbose parsed url   hostname: null,
+13 verbose parsed url   hash: null,
+13 verbose parsed url   search: null,
+13 verbose parsed url   query: null,
+13 verbose parsed url   pathname: '0.2.2',
+13 verbose parsed url   path: '0.2.2',
+13 verbose parsed url   href: '0.2.2' }
+14 verbose addNamed [ 'node-lmdb', '0.2.2' ]
+15 verbose addNamed [ '0.2.2', '0.2.2' ]
+16 verbose already installed skipping async@~0.9.0 C:\cygwin64\home\htao\ngraph-lmdb
+17 verbose already installed skipping ngraph.shremlin@0.0.1 C:\cygwin64\home\htao\ngraph-lmdb
+18 verbose already installed skipping underscore@^1.6.0 C:\cygwin64\home\htao\ngraph-lmdb
+19 verbose already installed skipping tap@~0.4.11 C:\cygwin64\home\htao\ngraph-lmdb
+20 silly lockFile 7dd2c22d-node-lmdb-0-2-2 node-lmdb@0.2.2
+21 verbose lock node-lmdb@0.2.2 C:\Users\htao\AppData\Roaming\npm-cache\7dd2c22d-node-lmdb-0-2-2.lock
+22 verbose url raw node-lmdb/0.2.2
+23 verbose url resolving [ 'https://registry.npmjs.org/', './node-lmdb/0.2.2' ]
+24 verbose url resolved https://registry.npmjs.org/node-lmdb/0.2.2
+25 info trying registry request attempt 1 at 13:36:30
+26 verbose etag "D8LJQIISBMNMMN4POP27VTJL7"
+27 http GET https://registry.npmjs.org/node-lmdb/0.2.2
+28 http 304 https://registry.npmjs.org/node-lmdb/0.2.2
+29 silly registry.get cb [ 304,
+29 silly registry.get   { date: 'Sat, 30 Aug 2014 17:36:30 GMT',
+29 silly registry.get     server: 'Apache',
+29 silly registry.get     via: '1.1 varnish',
+29 silly registry.get     'last-modified': 'Sat, 30 Aug 2014 17:36:31 GMT',
+29 silly registry.get     'cache-control': 'max-age=60',
+29 silly registry.get     etag: '"D8LJQIISBMNMMN4POP27VTJL7"',
+29 silly registry.get     'x-served-by': 'cache-jfk1028-JFK',
+29 silly registry.get     'x-cache': 'MISS',
+29 silly registry.get     'x-cache-hits': '0',
+29 silly registry.get     'x-timer': 'S1409420190.979234,VS0,VE78',
+29 silly registry.get     vary: 'Accept',
+29 silly registry.get     'content-length': '0',
+29 silly registry.get     'keep-alive': 'timeout=10, max=50',
+29 silly registry.get     connection: 'Keep-Alive' } ]
+30 verbose etag node-lmdb/0.2.2 from cache
+31 silly lockFile 7dd2c22d-node-lmdb-0-2-2 node-lmdb@0.2.2
+32 silly lockFile 7dd2c22d-node-lmdb-0-2-2 node-lmdb@0.2.2
+33 silly resolved [ { name: 'node-lmdb',
+33 silly resolved     description: 'Node binding for LMDB, the Lightning Memory-Mapped Database',
+33 silly resolved     author: { name: 'Timur Kristóf', email: 'venemo@fedoraproject.org' },
+33 silly resolved     keywords: [ 'lmdb', 'database', 'mdb', 'lightning', 'binding' ],
+33 silly resolved     repository: { type: 'git', url: 'https://github.com/Venemo/node-lmdb' },
+33 silly resolved     version: '0.2.2',
+33 silly resolved     main: './build/Release/node-lmdb',
+33 silly resolved     gypfile: true,
+33 silly resolved     scripts: { install: 'node-gyp rebuild' },
+33 silly resolved     readme: 'node-lmdb\n=========\n\nThis is a node.js binding for LMDB, an extremely fast and lightweight transactional key-value store database.\n\nAbout\n-----\n\n### About this module\n\nThe aim of this node module is to provide bindings so that people can use LMDB from their node applications, aiming for a simple and clean API which is on par with the LMDB API but tries to apply javascript patterns and naming conventions as much as possible to make users feel familiar about it.\n\nWe support **zero-copy** retrieval of **string** and **binary** values. Binary values are operated on via the Node.js `Buffer` API.\n\n### About LMDB\n\nHere are the main highlights of LMDB, for more, visit http://symas.com/mdb :)\n\n* Key-value store, NoSQL\n* In-process, no need to squeeze your data through a socket\n* Support for transactions and multiple databases in the same environment\n* Support for multi-threaded and multi-process use\n* Zero-copy lookup (memory map)\n\n### Supported platforms\n\n* Tested and works on Linux (author uses Fedora 20)\n* Tested and works on Mac OS X - see https://github.com/Venemo/node-lmdb/issues/3\n* **Not yet tested** on Windows - see https://github.com/Venemo/node-lmdb/issues/2\n\nUsage\n-----\n\n### Introduction\n\n#### Step 0: require the module\n\nJust like with any other node module, the first step is to `require()` the module.\n\n```javascript\nvar lmdb = require(\'node-lmdb\');\n```\n\n#### Step 1: create an environment\n\n`Env` represents a database environment. You can create one with the `new` operator and after that, you must open it before you can use it.\n`open()` accepts an object literal in which you can specify the configuration options for the environment.\n\n```javascript\nvar env = new lmdb.Env();\nenv.open({\n    path: __dirname + "/mydata",\n    mapSize: 2*1024*1024*1024, // maximum database size\n    maxDbs: 3\n});\n```\n\nClose the environment when you no longer need it.\n\n```javascript\nenv.close();\n```\n\n#### Step 2: open one or more databases\n\nAn environment (`Env`) can contain one or more databases. Open a database with `env.openDbi()` which takes an object literal with which you can configure your database.\n\n```javascript\nvar dbi = env.openDbi({\n    name: "myPrettyDatabase",\n    create: true // will create if database did not exist\n})\n```\n\nClose the database when you no longer need it.\n\n```javascript\ndbi.close();\n```\n\n#### Step 3: use transactions\n\nThe basic unit of work in LMDB is a transaction, which is called `Txn` for short. Here is how you operate with your data.\nEvery piece of data in LMDB is referred to by a **key**.\nYou can use the methods `getString()`, `getBinary()`, `getNumber()` and `getBoolean()` to retrieve something,\n`putString()`, `putBinary()`, `putNumber()` and `putBoolean()` to store something and `del()` to delete something.\n\nCurrently **only string, binary, number and boolean values are supported**, use `JSON.stringify` and `JSON.parse` for complex data structures.\nBecause of the nature of LMDB, the data returned by `txn.getString()` and `txn.getBinary()` is only valid until the next `put` operation or the end of the transaction.\nIf you need to use the data *later*, you will have to copy it for yourself.\n\n**IMPORTANT:** always close your transactions with `abort()` or `commit()` when you are done with them.\n\n```javascript\nvar txn = env.beginTxn();\nvar value = txn.getString(dbi, 1);\n\nconsole.log(value);\n\nif (value === null) {\n    txn.putString(dbi, 1, "Hello world!");\n}\nelse {\n    txn.del(dbi, 1);\n}\n\ntxn.putString(dbi, 2, "Yes, it\'s this simple!");\ntxn.commit();\n```\n\n### Basic concepts\n\nLMDB has four different entities:\n\n* `Env` represents a full database environment. The same environment can be used by multiple processes, but a particular `Env` object **must** be used by one process only. You can operate with the same environment from multiple threads.\n* `Dbi` represents a sub-database which belongs to a database environment. The same environment can contain either multiple named databases or an unnamed database.\n* `Txn` represents a transaction. Multiple threads can open transactions for the same `Env`, but a particular `Txn` object **must** only be accessed by one thread, and only one `Txn` object can be used on a thread at a time. (NOTE: The `noTls` option in the environment will change this behaviour for *read-only* transactions, so that a thread can then create any number of *read-only* transactions and any number of threads can access the same *read-only* transaction.) Note that **only one** *write* transaction can be open in an environment in any given time. `env.beginTxn()` will simply block until the previous one is either `commit()`ted or `abort()`ed.\n* `Cursor` objects can be used to iterate through multiple keys in the same database.\n\nHere is how you use LMDB in a typical scenario:\n\n* You create an `Env` and `open()` it with the desired configuration options.\n* You open a `Dbi` by calling `env.openDbi()` and passing the database configuration options.\n* Now you can create `Txn`s with `env.beginTxn()` and operate on the database through a transaction by calling `txn.getString()`, `txn.putString()` etc.\n* When you are done, you should either `abort()` or `commit()` your transactions and `close()` your databases and environment.\n\n### Examples\n\nYou can find some in the source tree. There are some basic examples and I intend to create some advanced ones too.\n\nThe basic examples we currently have:\n\n* `example1-env.js` - shows basic usage of `Env`, `Dbi` and `Txn` operating on string values\n* `example2-datatypes.js` - shows how to use various data types for your data\n* `example3-multiple-transactions.js` - shows how LMDB will behave if you operate with multiple transactions\n* `example4-cursors.js` - shows how to work with cursors on a basic database\n* `example5-dupsort.js` - shows how to use a `dupSort` database with cursors\n* `example6-asyncio.js` - shows how to use the fastest (but also most dangerous) way for async IO\n* `example7-largedb.js` - shows how to work with an insanely large database\n\nAdvanced examples:\n\n* `example-advanced1-indexing.js` - this is a module pattern example which demonstrates the implementation of a search engine prototype\n* *More will come later, so don\'t forget to check back!*\n\n### Limitations of node-lmdb\n\n* **Only string, binary, number and boolean values are supported.** If you want to store complex data structures, use `JSON.stringify` before putting it into the database and `JSON.parse` when you retrieve the data.\n* **Only string and unsigned integer keys are supported.** Default is string, specify `keyIsUint32: true` to `openDbi` for unsigned integer. It would make the API too complicated to support more data types for keys.\n* Because of the nature of LMDB, the data returned by `txn.getString()` and `txn.getBinary()` is **only valid until the next `put` operation or the end of the transaction**. If you need to use the data *later*, you will have to copy it for yourself.\n* Fixed address map (called `MDB_FIXEDMAP` in C) features are **not exposed** by this binding because they are highly experimental\n* Not all functions are wrapped by the binding yet. If there\'s one that you would like to see, drop me a line.\n\nContributing\n------------\n\nIf you find problems with this module, open an issue on GitHub.\nAlso feel free to send me pull requests. Contributions are more than welcome! :)\n\n### Building the module\n\nLMDB is bundled in `node-lmdb` so you can simply build this module using `node-gyp`.\n\n```bash\n# Install node-gyp globally (needs admin permissions)\nnpm -g install node-gyp\n\n# Clone node-lmdb\ngit clone git@github.com:Venemo/node-lmdb.git\n\n# Build\ncd node-lmdb\nnode-gyp configure\nnode-gyp build\n```\n\n### Managing the LMDB dependency\n\n```bash\n# Adding upstream LMDB as remote\ngit remote add lmdb git@gitorious.org:mdb/mdb.git\n# Fetch new remote\ngit fetch lmdb\n# Adding the subtree (when it\'s not there yet)\ngit subtree add  --prefix=dependencies/lmdb lmdb HEAD --squash\n# Updating the subtree (when already added)\ngit subtree pull --prefix=dependencies/lmdb lmdb HEAD --squash\n```\n\n### Developer FAQ\n\n#### How fast is this stuff?\n\nLMDB is one of the fastest databases on the planet, because it\'s **in-process** and **zero-copy**, which means it runs within your app, and not somewhere else,\nso it doesn\'t push your data through sockets and can retrieve your data without copying it in memory.\n\nWe don\'t have any benchmarks for node-lmdb but you can enjoy a detailed benchmark of LMDB here: http://symas.com/mdb/microbench/\nobviously, the V8 wrapper will have some negative impact on performance, but I wouldn\'t expect a significant difference.\n\n#### Why is the code so ugly?\n\nUnfortunately, writing C++ addons to Node.js (and V8) requires a special pattern (as described in their docs) which most developers might find ugly.\nFortunately, we\'ve done this work for you so you can enjoy LMDB without the need to code C++.\n\n#### How does this module work?\n\nIt glues together LMDB and Node.js with a native Node.js addon that wraps the LMDB C API.\n\nZero-copy is implemented for string and binary values via a V8 custom external string resource and the Node.js Buffer class.\n\n#### How did you do it?\n\nThese are the places I got my knowledge when developing node-lmdb:\n\n* V8 reference documentation: http://bespin.cz/~ondras/html/\n* Node.js C++ addons documentation: http://nodejs.org/api/addons.html\n* LMDB documentation: http://symas.com/mdb/doc/\n',
+33 silly resolved     readmeFilename: 'README.md',
+33 silly resolved     bugs: { url: 'https://github.com/Venemo/node-lmdb/issues' },
+33 silly resolved     homepage: 'https://github.com/Venemo/node-lmdb',
+33 silly resolved     _id: 'node-lmdb@0.2.2',
+33 silly resolved     _from: 'node-lmdb@0.2.2' } ]
+34 info install node-lmdb@0.2.2 into C:\cygwin64\home\htao\ngraph-lmdb
+35 info installOne node-lmdb@0.2.2
+36 info C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb unbuild
+37 verbose tar unpack C:\Users\htao\AppData\Roaming\npm-cache\node-lmdb\0.2.2\package.tgz
+38 silly lockFile 47875894-raph-lmdb-node-modules-node-lmdb tar://C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb
+39 verbose lock tar://C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb C:\Users\htao\AppData\Roaming\npm-cache\47875894-raph-lmdb-node-modules-node-lmdb.lock
+40 silly lockFile d3235239-ache-node-lmdb-0-2-2-package-tgz tar://C:\Users\htao\AppData\Roaming\npm-cache\node-lmdb\0.2.2\package.tgz
+41 verbose lock tar://C:\Users\htao\AppData\Roaming\npm-cache\node-lmdb\0.2.2\package.tgz C:\Users\htao\AppData\Roaming\npm-cache\d3235239-ache-node-lmdb-0-2-2-package-tgz.lock
+42 silly gunzTarPerm modes [ '755', '644' ]
+43 silly gunzTarPerm extractEntry package.json
+44 silly gunzTarPerm modified mode [ 'package.json', 438, 420 ]
+45 silly gunzTarPerm extractEntry .npmignore
+46 silly gunzTarPerm modified mode [ '.npmignore', 438, 420 ]
+47 silly gunzTarPerm extractEntry README.md
+48 silly gunzTarPerm modified mode [ 'README.md', 438, 420 ]
+49 silly gunzTarPerm extractEntry example-advanced1-indexing.js
+50 silly gunzTarPerm modified mode [ 'example-advanced1-indexing.js', 438, 420 ]
+51 silly gunzTarPerm extractEntry example1-env.js
+52 silly gunzTarPerm modified mode [ 'example1-env.js', 438, 420 ]
+53 silly gunzTarPerm extractEntry example2-datatypes.js
+54 silly gunzTarPerm modified mode [ 'example2-datatypes.js', 438, 420 ]
+55 silly gunzTarPerm extractEntry example3-multiple-transactions.js
+56 silly gunzTarPerm modified mode [ 'example3-multiple-transactions.js', 438, 420 ]
+57 silly gunzTarPerm extractEntry example4-cursors.js
+58 silly gunzTarPerm modified mode [ 'example4-cursors.js', 438, 420 ]
+59 silly gunzTarPerm extractEntry example6-asyncio.js
+60 silly gunzTarPerm modified mode [ 'example6-asyncio.js', 438, 420 ]
+61 silly gunzTarPerm extractEntry example7-largedb.js
+62 silly gunzTarPerm modified mode [ 'example7-largedb.js', 438, 420 ]
+63 silly gunzTarPerm extractEntry example5-dupsort.js
+64 silly gunzTarPerm modified mode [ 'example5-dupsort.js', 438, 420 ]
+65 silly gunzTarPerm extractEntry libraries/liblmdb/.npmignore
+66 silly gunzTarPerm modified mode [ 'libraries/liblmdb/.npmignore', 438, 420 ]
+67 silly gunzTarPerm extractEntry libraries/liblmdb/LICENSE
+68 silly gunzTarPerm modified mode [ 'libraries/liblmdb/LICENSE', 438, 420 ]
+69 silly gunzTarPerm extractEntry libraries/liblmdb/COPYRIGHT
+70 silly gunzTarPerm modified mode [ 'libraries/liblmdb/COPYRIGHT', 438, 420 ]
+71 silly gunzTarPerm extractEntry libraries/liblmdb/Doxyfile
+72 silly gunzTarPerm modified mode [ 'libraries/liblmdb/Doxyfile', 438, 420 ]
+73 silly gunzTarPerm extractEntry libraries/liblmdb/sample-mdb.txt
+74 silly gunzTarPerm modified mode [ 'libraries/liblmdb/sample-mdb.txt', 438, 420 ]
+75 silly gunzTarPerm extractEntry libraries/liblmdb/lmdb.h
+76 silly gunzTarPerm modified mode [ 'libraries/liblmdb/lmdb.h', 438, 420 ]
+77 silly gunzTarPerm extractEntry libraries/liblmdb/mdb.c
+78 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mdb.c', 438, 420 ]
+79 silly gunzTarPerm extractEntry libraries/liblmdb/mdb_copy.1
+80 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mdb_copy.1', 438, 420 ]
+81 silly gunzTarPerm extractEntry libraries/liblmdb/mdb_copy.c
+82 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mdb_copy.c', 438, 420 ]
+83 silly gunzTarPerm extractEntry libraries/liblmdb/mdb_stat.1
+84 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mdb_stat.1', 438, 420 ]
+85 silly gunzTarPerm extractEntry libraries/liblmdb/CHANGES
+86 silly gunzTarPerm modified mode [ 'libraries/liblmdb/CHANGES', 438, 420 ]
+87 silly gunzTarPerm extractEntry libraries/liblmdb/midl.c
+88 silly gunzTarPerm modified mode [ 'libraries/liblmdb/midl.c', 438, 420 ]
+89 silly gunzTarPerm extractEntry libraries/liblmdb/midl.h
+90 silly gunzTarPerm modified mode [ 'libraries/liblmdb/midl.h', 438, 420 ]
+91 silly gunzTarPerm extractEntry libraries/liblmdb/mtest.c
+92 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mtest.c', 438, 420 ]
+93 silly gunzTarPerm extractEntry libraries/liblmdb/mtest2.c
+94 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mtest2.c', 438, 420 ]
+95 silly gunzTarPerm extractEntry libraries/liblmdb/mtest3.c
+96 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mtest3.c', 438, 420 ]
+97 silly gunzTarPerm extractEntry libraries/liblmdb/mtest4.c
+98 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mtest4.c', 438, 420 ]
+99 silly gunzTarPerm extractEntry libraries/liblmdb/mtest5.c
+100 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mtest5.c', 438, 420 ]
+101 silly gunzTarPerm extractEntry libraries/liblmdb/mtest6.c
+102 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mtest6.c', 438, 420 ]
+103 silly gunzTarPerm extractEntry libraries/liblmdb/sample-bdb.txt
+104 silly gunzTarPerm modified mode [ 'libraries/liblmdb/sample-bdb.txt', 438, 420 ]
+105 silly gunzTarPerm extractEntry libraries/liblmdb/mdb_stat.c
+106 silly gunzTarPerm modified mode [ 'libraries/liblmdb/mdb_stat.c', 438, 420 ]
+107 silly gunzTarPerm extractEntry binding.gyp
+108 silly gunzTarPerm modified mode [ 'binding.gyp', 438, 420 ]
+109 silly gunzTarPerm extractEntry src/cursor.cpp
+110 silly gunzTarPerm modified mode [ 'src/cursor.cpp', 438, 420 ]
+111 silly gunzTarPerm extractEntry src/dbi.cpp
+112 silly gunzTarPerm modified mode [ 'src/dbi.cpp', 438, 420 ]
+113 silly gunzTarPerm extractEntry src/env.cpp
+114 silly gunzTarPerm modified mode [ 'src/env.cpp', 438, 420 ]
+115 silly gunzTarPerm extractEntry src/misc.cpp
+116 silly gunzTarPerm modified mode [ 'src/misc.cpp', 438, 420 ]
+117 silly gunzTarPerm extractEntry src/node-lmdb.cpp
+118 silly gunzTarPerm modified mode [ 'src/node-lmdb.cpp', 438, 420 ]
+119 silly gunzTarPerm extractEntry src/node-lmdb.h
+120 silly gunzTarPerm modified mode [ 'src/node-lmdb.h', 438, 420 ]
+121 silly gunzTarPerm extractEntry src/txn.cpp
+122 silly gunzTarPerm modified mode [ 'src/txn.cpp', 438, 420 ]
+123 silly lockFile 47875894-raph-lmdb-node-modules-node-lmdb tar://C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb
+124 silly lockFile 47875894-raph-lmdb-node-modules-node-lmdb tar://C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb
+125 silly lockFile d3235239-ache-node-lmdb-0-2-2-package-tgz tar://C:\Users\htao\AppData\Roaming\npm-cache\node-lmdb\0.2.2\package.tgz
+126 silly lockFile d3235239-ache-node-lmdb-0-2-2-package-tgz tar://C:\Users\htao\AppData\Roaming\npm-cache\node-lmdb\0.2.2\package.tgz
+127 info preinstall node-lmdb@0.2.2
+128 verbose readDependencies using package.json deps
+129 verbose readDependencies using package.json deps
+130 silly resolved []
+131 verbose about to build C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb
+132 info build C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb
+133 verbose linkStuff [ false,
+133 verbose linkStuff   false,
+133 verbose linkStuff   false,
+133 verbose linkStuff   'C:\\cygwin64\\home\\htao\\ngraph-lmdb\\node_modules' ]
+134 info linkStuff node-lmdb@0.2.2
+135 verbose linkBins node-lmdb@0.2.2
+136 verbose linkMans node-lmdb@0.2.2
+137 verbose rebuildBundles node-lmdb@0.2.2
+138 info install node-lmdb@0.2.2
+139 verbose unsafe-perm in lifecycle true
+140 info node-lmdb@0.2.2 Failed to exec install script
+141 info C:\cygwin64\home\htao\ngraph-lmdb\node_modules\node-lmdb unbuild
+142 info preuninstall node-lmdb@0.2.2
+143 info uninstall node-lmdb@0.2.2
+144 verbose true,C:\cygwin64\home\htao\ngraph-lmdb\node_modules,C:\cygwin64\home\htao\ngraph-lmdb\node_modules unbuild node-lmdb@0.2.2
+145 info postuninstall node-lmdb@0.2.2
+146 error node-lmdb@0.2.2 install: `node-gyp rebuild`
+146 error Exit status 1
+147 error Failed at the node-lmdb@0.2.2 install script.
+147 error This is most likely a problem with the node-lmdb package,
+147 error not with npm itself.
+147 error Tell the author that this fails on your system:
+147 error     node-gyp rebuild
+147 error You can get their info via:
+147 error     npm owner ls node-lmdb
+147 error There is likely additional logging output above.
+148 error System Windows_NT 6.1.7601
+149 error command "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install"
+150 error cwd C:\cygwin64\home\htao\ngraph-lmdb
+151 error node -v v0.10.24
+152 error npm -v 1.3.21
+153 error code ELIFECYCLE
+154 verbose exit [ 1, true ]

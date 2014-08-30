@@ -40,6 +40,7 @@ g.V({title:'odd'}).forEach(function(err, d, index, cursor, txn) {
 });
 */
 
+/*
 g.V('0')
   .outE('knows')
   .forEach(function(err, d, index, cursor, txn) {
@@ -59,10 +60,17 @@ g.V('1')
       txn.abort();
     }
   });
+*/
 
 g.V('0')
-  .outE('knows')
-  .getCurrentPath(console.log)
+  .outE('likes')
+  .path(function(err, d, index, cursor, txn) {
+    console.log(d);
+    if (index > 99){
+      cursor.close();
+      txn.abort();
+    }
+  });
 
 /*
 g.V('0')
