@@ -64,12 +64,9 @@ g.V('1')
 
 g.V('0')
   .outE('likes')
-  .path(function(err, d, index, cursor, txn) {
+  .path()
+  .forEach(function(err, d) {
     console.log(d);
-    if (index > 99){
-      cursor.close();
-      txn.abort();
-    }
   });
 
 /*
