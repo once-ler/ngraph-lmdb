@@ -62,8 +62,21 @@ g.V('1')
   });
 */
 
+//var n = graph.getNode('0');
+//console.log(n);
+
+/*
 g.V('0')
   .outE('likes')
+  .path()
+  .forEach(function(err, path) {
+    console.log(path);
+  });
+*/
+
+g.V('0')
+  .outE('likes')
+  .inV()
   .path()
   .forEach(function(err, path) {
     console.log(path);
