@@ -65,9 +65,17 @@ g.V('1')
 g.V('0')
   .outE('likes')
   .path()
-  .forEach(function(err, d) {
-    console.log(d);
+  .forEach(function(err, path) {
+    console.log(path);
   });
+
+/*
+var w = g.V('0')
+  .outE('likes')
+  .path();
+
+  console.log(w)
+*/
 
 /*
 g.V('0')
