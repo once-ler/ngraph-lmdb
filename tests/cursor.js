@@ -190,8 +190,22 @@ expect:
 { id: '1' }
 { id: '9' }
 **/
+/*
 g.V('2')
   .out()
+  .forEach(function(err, d, index, cursor, txn) {
+    console.log(d);
+    if (index > 99){
+      cursor.close();
+      txn.abort();
+    }
+  });
+*/
+
+g.V('1')
+  .outE('knows')
+  .inV()
+  .outE() //NOT WORKING!!
   .forEach(function(err, d, index, cursor, txn) {
     console.log(d);
     if (index > 99){
