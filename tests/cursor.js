@@ -192,7 +192,7 @@ expect:
 **/
 g.V('2')
   .out()
-  //TODO .out() does not work!
+  //TODO .out() not works!
   .forEach(function(err, d, index, cursor, txn) {
     console.log(d);
     if (index > 99){
