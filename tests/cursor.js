@@ -177,8 +177,8 @@ g.V('3')
   });
 */
 
-g.V('4')
-  .out('studies')
+g.V('2')
+  .out()
   //TODO .out() does not work!
   .forEach(function(err, d, index, cursor, txn) {
     console.log(d);
