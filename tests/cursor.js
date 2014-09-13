@@ -202,10 +202,34 @@ g.V('2')
   });
 */
 
+/*
+outE('knows')
+{ fromId: '1', toId: '3', id: '1:knows:3', label: 'knows' }
+{ fromId: '1', toId: '4', id: '1:knows:4', label: 'knows' }
+{ fromId: '1', toId: '4', id: '1:knows:4@1', label: 'knows' }
+{ fromId: '1', toId: '5', id: '1:knows:5', label: 'knows' }
+inV()
+3
+4
+4
+5
+expect:
+outE('studies')
+{ fromId: '3', toId: '0', id: '3:studies:0', label: 'studies' }
+{ fromId: '3', toId: '3', id: '3:studies:3', label: 'studies' }
+{ fromId: '3', toId: '7', id: '3:studies:7', label: 'studies' }
+{ fromId: '4', toId: '1', id: '4:studies:1', label: 'studies' }
+{ fromId: '4', toId: '4', id: '4:studies:4', label: 'studies' }
+{ fromId: '4', toId: '8', id: '4:studies:8', label: 'studies' }
+{ fromId: '5', toId: '6', id: '5:studies:6', label: 'studies' }
+{ fromId: '5', toId: '7', id: '5:studies:7', label: 'studies' }
+{ fromId: '5', toId: '8', id: '5:studies:8', label: 'studies' }
+*/
+
 g.V('1')
   .outE('knows')
   .inV()
-  .outE() //NOT WORKING!!
+  .outE('studies') //NOT WORKING!!
   .forEach(function(err, d, index, cursor, txn) {
     console.log(d);
     if (index > 99){
@@ -213,3 +237,16 @@ g.V('1')
       txn.abort();
     }
   });
+/*
+  g.V('1')
+  .outE('knows')
+  .inV()
+  .outE()
+  .forEach(function(err, d, index, cursor, txn) {
+    console.log(d);
+    if (index > 99){
+      cursor.close();
+      txn.abort();
+    }
+  });
+  */
