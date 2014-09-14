@@ -215,21 +215,27 @@ inV()
 5
 expect:
 outE('studies')
+//note: 1:knows:3
 { fromId: '3', toId: '0', id: '3:studies:0', label: 'studies' }
 { fromId: '3', toId: '3', id: '3:studies:3', label: 'studies' }
 { fromId: '3', toId: '7', id: '3:studies:7', label: 'studies' }
+//note: 1:knows:4
 { fromId: '4', toId: '1', id: '4:studies:1', label: 'studies' }
 { fromId: '4', toId: '4', id: '4:studies:4', label: 'studies' }
 { fromId: '4', toId: '8', id: '4:studies:8', label: 'studies' }
+//note: 1:knows:4@1
+{ fromId: '4', toId: '1', id: '4:studies:1', label: 'studies' }  
+{ fromId: '4', toId: '4', id: '4:studies:4', label: 'studies' }
+{ fromId: '4', toId: '8', id: '4:studies:8', label: 'studies' }
+//note: 1:knows:5
 { fromId: '5', toId: '6', id: '5:studies:6', label: 'studies' }
 { fromId: '5', toId: '7', id: '5:studies:7', label: 'studies' }
 { fromId: '5', toId: '8', id: '5:studies:8', label: 'studies' }
-*/
 
 g.V('1')
   .outE('knows')
   .inV()
-  .outE('studies') //NOT WORKING!!
+  .outE('studies') //WORKING!!
   .forEach(function(err, d, index, cursor, txn) {
     console.log(d);
     if (index > 99){
@@ -237,10 +243,87 @@ g.V('1')
       txn.abort();
     }
   });
+*/
+
 /*
-  g.V('1')
+expect:
+{ id: '0' }
+{ id: '3' }
+{ id: '7' }
+{ id: '1' }
+{ id: '4' }
+{ id: '8' }
+{ id: '1' }
+{ id: '4' }
+{ id: '8' }
+{ id: '6' }
+{ id: '7' }
+{ id: '8' }
+
+g.V('1')
   .outE('knows')
   .inV()
+  .outE('studies')
+  .inV()
+  .forEach(function(err, d, index, cursor, txn) {
+    console.log(d);
+    if (index > 99){
+      cursor.close();
+      txn.abort();
+    }
+  });
+*/
+
+/**
+  complicated path, 5 traversals
+  1->knows->studies->likes->
+
+  example output:
+  [ { id: '1' },
+  { fromId: '1', toId: '5', id: '1:knows:5', label: 'knows' },
+  { id: '5' },
+  { fromId: '5', toId: '8', id: '5:studies:8', label: 'studies' },
+  { id: '8' },
+  { fromId: '8', toId: '1', id: '8:likes:1@1', label: 'likes' },
+  { id: '1' },
+  { fromId: '1', toId: '4', id: '1:knows:4', label: 'knows' },
+  { id: '4' },
+  { fromId: '4', toId: '8', id: '4:studies:8', label: 'studies' },
+  { id: '8' } ]
+**/
+g.V('1')
+  .outE('knows')
+  .inV()
+  .outE('studies')
+  .inV()
+  .outE('likes')
+  .inV()
+  .outE('knows')
+  .inV()
+  .outE('studies')
+  .inV()
+  .path()
+  .forEach(function(err, path) {
+    console.log(path);
+  });
+
+
+
+/*
+  Get all out edges for '1', expect:
+
+{ fromId: '1', toId: '3', id: '1:knows:3', label: 'knows' }
+{ fromId: '1', toId: '4', id: '1:knows:4', label: 'knows' }
+{ fromId: '1', toId: '4', id: '1:knows:4@1', label: 'knows' }
+{ fromId: '1', toId: '5', id: '1:knows:5', label: 'knows' }
+{ fromId: '1', toId: '5', id: '1:likes:5', label: 'likes' }
+{ fromId: '1', toId: '9', id: '1:likes:9', label: 'likes' }
+{ fromId: '1', toId: '9', id: '1:likes:9@1', label: 'likes' }
+{ fromId: '1', toId: '1', id: '1:studies:1', label: 'studies' }
+{ fromId: '1', toId: '7', id: '1:studies:7', label: 'studies' }
+{ fromId: '1', toId: '8', id: '1:studies:8', label: 'studies' }
+
+g.V('1')
   .outE()
   .forEach(function(err, d, index, cursor, txn) {
     console.log(d);
@@ -249,4 +332,4 @@ g.V('1')
       txn.abort();
     }
   });
-  */
+*/
