@@ -4,7 +4,7 @@
   "description": "Experiment using the insanely fast lmdb as persistence store to the great ngraph core",
   "main": "index.js",
   "scripts": {
-    "test": "test.js"
+    "test": "node_modules/.bin/mocha -w"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "underscore": "^1.6.0"
   },
   "devDependencies": {
-    "tap": "~0.4.11"
+    "should": "~4.0.4",
+    "mocha": "~1.21.4"
   }
 }
