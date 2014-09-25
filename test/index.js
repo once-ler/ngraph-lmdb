@@ -47,6 +47,7 @@ describe('Setup graph', function(){
 
 });
 
+
 describe('Setup shremlin', function(){
 
   var graph = require('../index')();
@@ -158,10 +159,19 @@ describe('Setup shremlin', function(){
     });
   });
 
+});
+
+describe('Test path', function() {
+
+  var graph = require('../index')();
+  var shremlin = require('../lib/lmdb-shremlin-wrap');
+  var g = shremlin(graph);
+
   describe('Get all paths with out edge labeled "studies" and then get the head (in) node for one node', function(){
-    it('should get 3 arrays.', function(done){
+    
+    it('should get 3 sets of arrays.', function(done){
       var count = 0;
-      g.V('2').outE('studies').inV().forEach(function(err, d, index, cursor, txn) {
+      g.V('2').outE('studies').inV().path().forEach(function(err, d, index, cursor, txn) {
         if (err){
           return done(err);
         }
@@ -169,27 +179,43 @@ describe('Setup shremlin', function(){
           return done('Item is undefined or null');
         }
 
-        it('should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item', function(done) { 
+        describe('Each item of the array is also an array with exactly 3 items', function() {
 
-          d.should.be.an.Array.and.match({
-            '0': function(it){
-              it.should.be.an.Object.and.have.ownProperty('id').and.eql('2');
-            },
-            '1': function(it){
-              d.should.be.an.Object.and.have.properties(['fromId','toId']).and.have.ownProperty('label').and.match(/studies/);
-            },
-            '2': function(it){
-              it.should.be.an.Object.and.have.ownProperty('id');
-            }
+          it('should be an Array and have length == 3', function() {
+            d.should.be.an.Array.have.lengthOf(3);
           });
-          done();
         });
 
-        count++;                
+        describe('Inspect each item #' + (count+1) + ' of the path', function() {
+
+          it('should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item', function(done) { 
+
+            d.should.match({
+              '0': function(it){
+                it.should.be.an.Object.and.have.ownProperty('id').and.eql('2');
+              },
+              '1': function(it){
+                it.should.be.an.Object.and.have.properties(['fromId','toId']).and.have.ownProperty('label').and.match(/studies/);
+              },
+              '2': function(it){
+                it.should.be.an.Object.and.have.ownProperty('id');
+              }
+            });
+
+            done();
+          });
+
+        });
+
+        count++;    
+
       });
+
       count.should.be.exactly(3);
       done();
+
     });
+
   });
 
 });
