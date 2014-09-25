@@ -10,13 +10,13 @@ describe('Setup graph', function(){
   var graph = require('../index')();
   graph.clear();
 
-  decribe('Add 10 nodes & 10 links per node', function(){
+  describe('Add 10 nodes & 10 links per node', function(){
 
     before(function(done){
 
       var count = 10;
       for(var i=0; i < count;i++){
-        graph.addNode(i+'', {title: (i % 2 == 0 ? 'Even better' : 'Odd better')});  
+        graph.addNode(i+'', {title: (i % 2 == 0 ? 'Even better' : 'Odd better')});
         for (var j=0; j < 10;j++){
           var n = Math.floor((Math.random() * count));
           var label = j % 2 == 0 ? 'likes' : 'studies';
@@ -24,7 +24,7 @@ describe('Setup graph', function(){
           graph.addLink(i+'', n+'', label);
         }
       }
-
+      done();
     });
 
     describe('Count nodes', function(){      
@@ -68,11 +68,11 @@ describe('Setup shremlin', function(){
       });
       count.should.be.exactly(10);
       done();
-    }
+    });
   });
 
   describe('Get one node by key value', function(){
-    it('should get an object with id == 0', function(done){
+    it('should get an object with id == 0 and data object with key named "title"', function(done){
       g.V('0').forEach(function(err, d, index, cursor, txn) {
         if (err){
           return done(err);
@@ -80,10 +80,10 @@ describe('Setup shremlin', function(){
         if (!d){
           return done('Item is undefined or null');
         }
-        d.should.be.an.Object.and.containEql({id:'0'});                
+        d.should.be.an.Object.and.containEql({id:'0'}).and.have.ownProperty('data').and.have.ownProperty('title');                
       });
       done();
-    }
+    });
   });
 
   describe('Get all nodes with title containing "even"', function(){
@@ -96,30 +96,30 @@ describe('Setup shremlin', function(){
         if (!d){
           return done('Item is undefined or null');
         }
-        d.should.be.an.Object.and.have.ownProperty('title').and.match(/even/);
+        d.should.be.an.Object.and.have.ownProperty('data').and.have.ownProperty('title').and.match(/even/i);
         count++;                
       });
       count.should.be.exactly(5);
       done();
-    }
+    });
   });
 
   describe('Get all nodes with title containing "odd"', function(){
     it('should get 5 objects with title == "odd"', function(done){
       var count = 0;
-      g.V({title:'even'}).forEach(function(err, d, index, cursor, txn) {
+      g.V({title:'odd'}).forEach(function(err, d, index, cursor, txn) {
         if (err){
           return done(err);
         }
         if (!d){
           return done('Item is undefined or null');
         }
-        d.should.be.an.Object.and.have.ownProperty('title').and.match(/odd/);
+        d.should.be.an.Object.and.have.ownProperty('data').and.have.ownProperty('title').and.match(/odd/i);
         count++;                
       });
       count.should.be.exactly(5);
       done();
-    }
+    });
   });
 
   describe('Get all out edges labeled "knows" for one node', function(){
@@ -137,7 +137,7 @@ describe('Setup shremlin', function(){
       });
       count.should.be.exactly(4);
       done();
-    }
+    });
   });
 
   describe('Get all in edges labeled "studies" for one node', function(){
@@ -155,7 +155,7 @@ describe('Setup shremlin', function(){
       });
       count.should.be.exactly(3);
       done();
-    }
+    });
   });
 
   describe('Get all paths with out edge labeled "studies" and then get the head (in) node for one node', function(){
@@ -189,7 +189,7 @@ describe('Setup shremlin', function(){
       });
       count.should.be.exactly(3);
       done();
-    }
+    });
   });
 
 });
