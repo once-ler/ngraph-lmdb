@@ -1,8 +1,8 @@
-var lmdb = require('lmdb'),  
+var lmdb = require('lmdb'),
   async = require('async'),
   coreObjects = require('./core-objects');
 
-module.exports = function (config) {
+module.exports = function(config) {
 
   var lmdbConfig = {
     path: process.cwd() + "/mydata"
@@ -23,10 +23,10 @@ module.exports = function (config) {
     sync: false,
     writeMap: true,
     metaSync: false,
-    mapAsync: true ,
-    mapSize: 2*1024*1024*1024   
+    mapAsync: true,
+    mapSize: 2 * 1024 * 1024 * 1024
   });
-  vertexDb.open(function (err) {
+  vertexDb.open(function(err) {
     if (err)
       throw err;
   });
@@ -36,10 +36,10 @@ module.exports = function (config) {
     sync: false,
     writeMap: true,
     metaSync: false,
-    mapAsync: true ,
-    mapSize: 2*1024*1024*1024
+    mapAsync: true,
+    mapSize: 2 * 1024 * 1024 * 1024
   });
-  edgeDb.open(function (err) {
+  edgeDb.open(function(err) {
     if (err)
       throw err;
   });
@@ -47,7 +47,7 @@ module.exports = function (config) {
   var multiEdgesDb = lmdb(path + '/multi-edges', {
     createIfMissing: true
   });
-  multiEdgesDb.open(function (err) {
+  multiEdgesDb.open(function(err) {
     if (err)
       throw err;
   });
@@ -55,35 +55,41 @@ module.exports = function (config) {
   var statsDb = lmdb(path + '/stats', {
     createIfMissing: true
   });
-  statsDb.open(function (err) {
+  statsDb.open(function(err) {
     if (err)
       throw err;
   });
 
   var linkConnectionSymbol = '->';
 
-  var dispose = function (db, callback) {
+  var dispose = function(db, callback) {
 
-    var it = db.iterator({ keyAsBuffer: false, valueAsBuffer: false }),
+    var it = db.iterator({
+        keyAsBuffer: false,
+        valueAsBuffer: false
+      }),
       fn = function(err, key, data) {
 
-        if (key && data){
-          db.del(key, function(err){
+        if (key && data) {
+          db.del(key, function(err) {
             process.nextTick(moveNext);
-          });          
-        }
-        else{ 
+          });
+        } else {
           callback(null, true)
-          it.end(function () {})
+          it.end(function() {})
         }
       },
-      moveNext = function() { it.next(fn); };
+      moveNext = function() {
+        it.next(fn);
+      };
 
-    moveNext();    
+    moveNext();
   };
 
-  var getNumber = function (dbi, key, callback) {
-    dbi.get(key, {asBuffer: false}, function (err, value) {
+  var getNumber = function(dbi, key, callback) {
+    dbi.get(key, {
+      asBuffer: false
+    }, function(err, value) {
       if (err) {
         return callback(null, 0);
       }
@@ -95,19 +101,18 @@ module.exports = function (config) {
     });
   };
 
-  var putJSON = function (dbi, key, value, callback) {
-    
-    callback = callback || function () {};
+  var putJSON = function(dbi, key, value, callback) {
+
+    callback = callback || function() {};
 
     var r = value || {};
     try {
       r = JSON.stringify(value);
-    }
-    catch(e) {
+    } catch (e) {
       //no op
     }
 
-    dbi.put(key, r, function (err) {
+    dbi.put(key, r, function(err) {
       if (err) {
         throw err;
       }
@@ -115,10 +120,10 @@ module.exports = function (config) {
     })
   };
 
-  var putNumber = function (dbi, key, value, callback) {
-    callback = callback || function () {};
+  var putNumber = function(dbi, key, value, callback) {
+    callback = callback || function() {};
 
-    dbi.put(key, value+'', function (err) {
+    dbi.put(key, value + '', function(err) {
       if (err) {
         return callback(null, 0);
       }
@@ -126,87 +131,89 @@ module.exports = function (config) {
     })
   };
 
-  var incrNumber = function (dbi, key, callback) {
+  var incrNumber = function(dbi, key, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
     async.waterfall([
 
-      function (next) {
+      function(next) {
         getNumber(dbi, key, next);
       },
-      function (value, next) {
+      function(value, next) {
         putNumber(dbi, key, ++value, next);
       }
-    ], function (err, value) {
-        callback(null, +value);
+    ], function(err, value) {
+      callback(null, +value);
     });
 
   };
 
-  var decrNumber = function (dbi, key, callback) {
+  var decrNumber = function(dbi, key, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
     async.waterfall([
 
-      function (next) {
+      function(next) {
         getNumber(dbi, key, next);
       },
-      function (value, next) {
+      function(value, next) {
         if (+value > 0) {
           putNumber(dbi, key, --value, next);
         } else {
           next(null, value);
         }
       }
-    ], function (err, value) {
-        callback(null, +value);
+    ], function(err, value) {
+      callback(null, +value);
     });
 
   };
 
-  var getNode = function (nodeId, callback) {
+  var getNode = function(nodeId, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
-    vertexDb.get(nodeId, {asBuffer:false}, function (err, value) {
+    vertexDb.get(nodeId, {
+      asBuffer: false
+    }, function(err, value) {
       if (err) {
         return callback(null, null);
       }
       var retval = value;
       try {
         retval = JSON.parse(value);
-      }
-      catch(e){
+      } catch (e) {
         //no op
       }
       callback(null, retval);
     });
   };
 
-  var getLink = function (edgeId, callback) {
+  var getLink = function(edgeId, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
-    edgeDb.get(edgeId, {asBuffer:false}, function (err, value) {
-      if (err) {        
-        return callback(null,null);
+    edgeDb.get(edgeId, {
+      asBuffer: false
+    }, function(err, value) {
+      if (err) {
+        return callback(null, null);
       }
       var retval = value;
       try {
         retval = JSON.parse(value);
-      }
-      catch(e){
+      } catch (e) {
         //no op
       }
       callback(null, retval);
     });
   };
 
-  var removeLink = function (link, callback) {
+  var removeLink = function(link, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
     if (!link) {
       return callback(null, false);
@@ -214,42 +221,42 @@ module.exports = function (config) {
 
     async.waterfall([
 
-      function (cb) {
+      function(cb) {
         getLink(link.id, cb);
       },
-      function (link, cb) {
+      function(link, cb) {
         if (!link) {
           cb('link is null');
         } else {
           cb(null, link);
         }
       },
-      function (link, cb) {
+      function(link, cb) {
         async.parallel([
 
-          function (cb1) {
+          function(cb1) {
             edgeDb.del(link.id, cb1);
           },
-          function (cb1) {
+          function(cb1) {
             decrNumber(statsDb, 'linksCount', cb1)
           }
-        ], function (err) {
+        ], function(err) {
           next(cb, link);
         });
       },
-      function (link, cb) {
+      function(link, cb) {
 
         async.each([link.fromId, link.toId],
-          function (id, cb1) {
+          function(id, cb1) {
 
-            var callback = function (err, node) {
+            var callback = function(err, node) {
 
               if (node) {
                 idx = coreObjects.indexOfElementInArray(link, node.links);
                 if (idx >= 0) {
                   node.links.splice(idx, 1);
                   //Update node
-                  putJSON(vertexDb, nodeId, data, cb1); 
+                  putJSON(vertexDb, nodeId, data, cb1);
                   //vertexDb.put(nodeId, JSON.stringify(data), cb1);
                 } else {
                   cb1();
@@ -262,12 +269,12 @@ module.exports = function (config) {
 
             getNode(id, callback);
 
-          }, function (err) {
+          }, function(err) {
             cb(null, link);
           });
 
       }
-    ], function (err, results) {
+    ], function(err, results) {
       if (err)
         callback(null, false);
       else
@@ -275,15 +282,15 @@ module.exports = function (config) {
     });
   };
 
-  var hasLink = function (fromNodeId, toNodeId, callback) {
+  var hasLink = function(fromNodeId, toNodeId, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
-    var next = function (err, node) {
+    var next = function(err, node) {
 
       //No node
       if (!node) {
-        return callback(null,null);
+        return callback(null, null);
       }
 
       //Node and link exists
@@ -298,7 +305,7 @@ module.exports = function (config) {
       }
 
       //No link
-      return callback(null,null);
+      return callback(null, null);
 
     };
 
@@ -306,15 +313,16 @@ module.exports = function (config) {
 
   };
 
-  var addNode = function (nodeId, data, callback) {
+  var addNode = function(nodeId, data, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
     async.waterfall([
-      function (cb) {
+
+      function(cb) {
         getNode(nodeId, cb);
       },
-      function (node, cb) {
+      function(node, cb) {
         if (!node) {
           node = new coreObjects.Node(nodeId);
           node.data = data ? data : {};
@@ -327,10 +335,10 @@ module.exports = function (config) {
           cb(null, node);
         }
       },
-      function (node, cb) {
-        
+      function(node, cb) {
+
         //putJSON(vertexDb, nodeId, node, cb); 
-        vertexDb.put(nodeId, JSON.stringify(node), function (err) {
+        vertexDb.put(nodeId, JSON.stringify(node), function(err) {
           if (err) {
             throw err;
           }
@@ -338,33 +346,33 @@ module.exports = function (config) {
         })
 
       }
-    ], function (err, node) {
+    ], function(err, node) {
       return callback(null, node);
-    });    
+    });
   };
 
-  var createLink = function (fromId, toId, data, callback, linkId, fromNode, toNode) {
+  var createLink = function(fromId, toId, data, callback, linkId, fromNode, toNode) {
 
     var link = new coreObjects.Link(fromId, toId, data, linkId);
 
     async.parallel([
 
-        function (cb2) {
-          putJSON(edgeDb, linkId, link, cb2);           
+        function(cb2) {
+          putJSON(edgeDb, linkId, link, cb2);
         },
-        function (cb2) {
+        function(cb2) {
           incrNumber(statsDb, 'linksCount', cb2);
         },
-        function (cb2) {
+        function(cb2) {
           fromNode.links.push(link);
-          putJSON(vertexDb, fromId, fromNode, cb2); 
+          putJSON(vertexDb, fromId, fromNode, cb2);
         },
-        function (cb2) {
+        function(cb2) {
           toNode.links.push(link);
           putJSON(vertexDb, toId, toNode, cb2);
         }
       ],
-      function (err) {
+      function(err) {
 
         if (err)
           throw err;
@@ -377,44 +385,44 @@ module.exports = function (config) {
       });
   }
 
-  var addLink = function (fromId, toId, data, callback) {
+  var addLink = function(fromId, toId, data, callback) {
 
     var linkId = fromId + linkConnectionSymbol + toId;
 
     var mainArguments = Array.prototype.slice.call(arguments);
 
-    if (!callback){
-      var fn = function(){};
+    if (!callback) {
+      var fn = function() {};
       mainArguments.push(fn)
     }
 
     async.parallel({
-      fromNode: function (next) {
+      fromNode: function(next) {
         addNode(fromId, null, next);
       },
-      toNode: function (next) {
+      toNode: function(next) {
         addNode(toId, null, next);
       },
-      edgeCount: function (next) {
+      edgeCount: function(next) {
 
-          async.waterfall([
+        async.waterfall([
 
-            function (cb) {
-              getNumber(multiEdgesDb, linkId, cb);
-            },
-            function (value, cb) {
-              if (value == 0) {
-                putNumber(multiEdgesDb, linkId, 1, cb);
-              } else {
-                incrNumber(multiEdgesDb, linkId, cb);
-              }
+          function(cb) {
+            getNumber(multiEdgesDb, linkId, cb);
+          },
+          function(value, cb) {
+            if (value == 0) {
+              putNumber(multiEdgesDb, linkId, 1, cb);
+            } else {
+              incrNumber(multiEdgesDb, linkId, cb);
             }
-          ], function (err, value) {
-            next(null, value);
-          })
+          }
+        ], function(err, value) {
+          next(null, value);
+        })
 
-        }
-    }, function (err, results) {
+      }
+    }, function(err, results) {
 
       if (err)
         throw err;
@@ -430,9 +438,9 @@ module.exports = function (config) {
 
   }
 
-  var removeNode = function (nodeId, callback) {
+  var removeNode = function(nodeId, callback) {
 
-    callback = callback || function () {};
+    callback = callback || function() {};
 
     function next(err, node) {
 
@@ -442,25 +450,25 @@ module.exports = function (config) {
 
       async.parallel([
 
-        function (cb) {
+        function(cb) {
           vertexDb.del(nodeId, cb);
         },
-        function (cb) {
+        function(cb) {
           decrNumber(statsDb, 'nodesCount', cb);
         },
-        function (cb) {
+        function(cb) {
 
           if (!node.links) {
             return cb();
           }
 
-          async.each(node.links, function (link, cb1) {
+          async.each(node.links, function(link, cb1) {
             removeLink(link, cb1);
-          }, function (err) {
+          }, function(err) {
             cb();
           });
         }
-      ], function (err) {
+      ], function(err) {
         callback(null, true);
       });
     }
@@ -482,64 +490,65 @@ module.exports = function (config) {
 
     hasLink: hasLink,
 
-    getNodesCount: function (callback) {
-      callback = callback || function () {};
+    getNodesCount: function(callback) {
+      callback = callback || function() {};
       getNumber(statsDb, 'nodesCount', callback);
     },
 
-    getLinksCount: function (callback) {
-      callback = callback || function () {};
+    getLinksCount: function(callback) {
+      callback = callback || function() {};
       getNumber(statsDb, 'linksCount', callback);
     },
 
-    getLinks: function (nodeId, callback) {
-      callback = callback || function () {};
-      var cb = function (err, node) {
+    getLinks: function(nodeId, callback) {
+      callback = callback || function() {};
+      var cb = function(err, node) {
         var v = node ? node.links : null;
         callback(null, v);
       }
       getNode(nodeId, cb);
     },
 
-    forEachNode: function (callback) {
+    forEachNode: function(callback) {
       if (typeof callback !== 'function') {
         return;
       }
 
 
-      var it = vertexDb.iterator({ keyAsBuffer: false, valueAsBuffer: false }),
+      var it = vertexDb.iterator({
+          keyAsBuffer: false,
+          valueAsBuffer: false
+        }),
         fn = function(err, key, data) {
 
-          if (key && data){
+          if (key && data) {
             var r = data;
-            try{
+            try {
               r = JSON.parse(data);
-            }
-            catch(e){
-            }
+            } catch (e) {}
 
-            if (callback(r)){
-              it.end(function () {});  
-            }
-            else {
+            if (callback(r)) {
+              it.end(function() {});
+            } else {
               process.nextTick(moveNext);
             }
-          }
-          else{ 
-            it.end(function () {});
+          } else {
+            it.end(function() {});
           }
         },
-        moveNext = function() { it.next(fn); };
+        moveNext = function() {
+          it.next(fn);
+        };
 
       moveNext();
 
     },
 
-    forEachLinkedNode: function (nodeId, callback, oriented) {
+    forEachLinkedNode: function(nodeId, callback, oriented) {
 
-      callback = callback || function () {};
+      callback = callback || function() {};
 
-      var next = function (err, node) {
+      var next = function(err, node) {
 
         var i,
           link,
@@ -552,7 +561,7 @@ module.exports = function (config) {
               link = node.links[i];
               if (link.fromId === nodeId) {
 
-                var cb = function (err, inNode) {
+                var cb = function(err, inNode) {
                   callback(inNode, link);
                 };
                 getNode(link.toId, cb);
@@ -565,7 +574,7 @@ module.exports = function (config) {
               link = node.links[i];
               linkedNodeId = link.fromId === nodeId ? link.toId : link.fromId;
 
-              var cb = function (err, linkedNode) {
+              var cb = function(err, linkedNode) {
                 callback(linkedNode, link);
               };
 
@@ -582,57 +591,59 @@ module.exports = function (config) {
 
     },
 
-    forEachLink: function (callback) {
-      
+    forEachLink: function(callback) {
+
       if (typeof callback === 'function') {
 
-        var it = edgeDb.iterator({ keyAsBuffer: false, valueAsBuffer: false }),
+        var it = edgeDb.iterator({
+            keyAsBuffer: false,
+            valueAsBuffer: false
+          }),
           fn = function(err, key, data) {
 
-            if (key && data){
+            if (key && data) {
               var r = data;
-              try{
+              try {
                 r = JSON.parse(data);
-              }
-              catch(e){
-              }
+              } catch (e) {}
 
               callback(r);
               process.nextTick(moveNext);
-            }
-            else{ 
-              it.end(function () {})
+            } else {
+              it.end(function() {})
             }
           },
-          moveNext = function() { it.next(fn); };
+          moveNext = function() {
+            it.next(fn);
+          };
 
         moveNext();
 
       }
     },
 
-    clear: function (callback) {
+    clear: function(callback) {
 
-      callback = callback || function () {};
+      callback = callback || function() {};
 
       async.parallel([
 
-        function (cb) {
+        function(cb) {
           dispose(vertexDb, cb);
         },
-        function (cb) {
+        function(cb) {
           statsDb.put('nodesCount', '0', cb);
         },
-        function (cb) {
+        function(cb) {
           dispose(edgeDb, cb);
         },
-        function (cb) {
+        function(cb) {
           statsDb.put('linksCount', '0', cb);
         },
-        function (cb) {
+        function(cb) {
           dispose(multiEdgesDb, cb);
         }
-      ], function (err) {
+      ], function(err) {
         if (callback) {
           callback(null, true);
         } else {

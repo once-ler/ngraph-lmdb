@@ -1,14 +1,16 @@
 var redis = require('redis'),
-  db = redis.createClient(6379, '127.0.0.1', { no_ready_check: true }),
+  db = redis.createClient(6379, '127.0.0.1', {
+    no_ready_check: true
+  }),
   async = require('async'),
   coreObjects = require('./core-objects');
-  
-module.exports = function (config) {
+
+module.exports = function(config) {
 
   var linkConnectionSymbol = '->';
 
-  var getNumber = function (key, callback) {
-    db.get(key, function (err, value) {
+  var getNumber = function(key, callback) {
+    db.get(key, function(err, value) {
       if (err) {
         return callback(null, 0);
       }
@@ -20,8 +22,8 @@ module.exports = function (config) {
     });
   };
 
-  var putNumber = function (key, value, callback) {
-    db.set(key, value, function (err) {
+  var putNumber = function(key, value, callback) {
+    db.set(key, value, function(err) {
       if (callback) {
         callback(null, +value);
       } else {
@@ -30,18 +32,18 @@ module.exports = function (config) {
     })
   };
 
-  var incrNumber = function (key, callback) {
+  var incrNumber = function(key, callback) {
 
     async.waterfall([
 
-      function (next) {
+      function(next) {
         getNumber(key, next);
       },
-      function (value, next) {
+      function(value, next) {
         //putNumber(key, ++value, next);
-        db.incr(key,next);
+        db.incr(key, next);
       }
-    ], function (err, value) {
+    ], function(err, value) {
       if (callback) {
         callback(null, +value);
       } else {
@@ -51,14 +53,14 @@ module.exports = function (config) {
 
   };
 
-  var decrNumber = function (key, callback) {
+  var decrNumber = function(key, callback) {
 
     async.waterfall([
 
-      function (next) {
+      function(next) {
         getNumber(key, next);
       },
-      function (value, next) {
+      function(value, next) {
         if (+value > 0) {
           //putNumber(dbi, key, --value, next);
           db.decr(key, next);
@@ -66,7 +68,7 @@ module.exports = function (config) {
           next(null, value);
         }
       }
-    ], function (err, value) {
+    ], function(err, value) {
       if (callback) {
         callback(null, +value);
       } else {
@@ -76,9 +78,9 @@ module.exports = function (config) {
 
   };
 
-  var getNode = function (nodeId, callback) {
+  var getNode = function(nodeId, callback) {
 
-    db.get(nodeId, function (err, value) {
+    db.get(nodeId, function(err, value) {
       if (err) {
 
         if (callback)
@@ -96,9 +98,9 @@ module.exports = function (config) {
     });
   };
 
-  var getLink = function (edgeId, callback) {
+  var getLink = function(edgeId, callback) {
 
-    db.get(edgeId, function (err, value) {
+    db.get(edgeId, function(err, value) {
       if (err) {
         if (callback)
           return callback(null, null);
@@ -115,7 +117,7 @@ module.exports = function (config) {
     });
   };
 
-  var removeLink = function (link, callback) {
+  var removeLink = function(link, callback) {
 
     if (!link) {
       return callback(null, false);
@@ -123,42 +125,42 @@ module.exports = function (config) {
 
     async.waterfall([
 
-      function (cb) {
+      function(cb) {
         getLink(link.id, cb);
       },
-      function (link, cb) {
+      function(link, cb) {
         if (!link) {
           cb('link is null');
         } else {
           cb(null, link);
         }
       },
-      function (link, cb) {
+      function(link, cb) {
         async.parallel([
 
-          function (cb1) {
-            
+          function(cb1) {
+
             db.mulit()
-            .del(link.id)
-            .srem('edges',link.id)
-            .exec(function(err){
-              cb1();
-            });
+              .del(link.id)
+              .srem('edges', link.id)
+              .exec(function(err) {
+                cb1();
+              });
 
           },
-          function (cb1) {
+          function(cb1) {
             decrNumber('linksCount', cb1)
           }
-        ], function (err) {
+        ], function(err) {
           next(cb, link);
         });
       },
-      function (link, cb) {
+      function(link, cb) {
 
         async.each([link.fromId, link.toId],
-          function (id, cb1) {
+          function(id, cb1) {
 
-            var callback = function (err, node) {
+            var callback = function(err, node) {
 
               if (node) {
                 idx = coreObjects.indexOfElementInArray(link, node.links);
@@ -178,12 +180,12 @@ module.exports = function (config) {
 
             getNode(id, callback);
 
-          }, function (err) {
+          }, function(err) {
             cb(null, link);
           });
 
       }
-    ], function (err, results) {
+    ], function(err, results) {
       if (err)
         callback(null, false);
       else
@@ -191,9 +193,9 @@ module.exports = function (config) {
     });
   };
 
-  var hasLink = function (fromNodeId, toNodeId, callback) {
+  var hasLink = function(fromNodeId, toNodeId, callback) {
 
-    var next = function (err, node) {
+    var next = function(err, node) {
 
       //No node
       if (!node) {
@@ -232,17 +234,18 @@ module.exports = function (config) {
 
   };
 
-  var addNode = function (nodeId, data, callback) {
+  var addNode = function(nodeId, data, callback) {
 
     async.waterfall([
-      function (cb) {
+
+      function(cb) {
         getNode(nodeId, cb);
       },
-      function (node, cb) {
+      function(node, cb) {
         if (!node) {
           node = new coreObjects.Node(nodeId);
           node.data = data ? data : {};
-          incrNumber('nodesCount', function (err) {
+          incrNumber('nodesCount', function(err) {
             cb(null, node);
           });
         } else {
@@ -252,16 +255,16 @@ module.exports = function (config) {
           cb(null, node);
         }
       },
-      function (node, cb) {
+      function(node, cb) {
 
         db.multi()
-        .set(nodeId, JSON.stringify(node))
-        .sadd('nodes', nodeId)
-        .exec(function (err) {
-          cb(null, node);
-        });
+          .set(nodeId, JSON.stringify(node))
+          .sadd('nodes', nodeId)
+          .exec(function(err) {
+            cb(null, node);
+          });
       }
-    ], function (err, node) {
+    ], function(err, node) {
       if (callback) {
         return callback(null, node);
       } else {
@@ -270,46 +273,11 @@ module.exports = function (config) {
     });
   };
 
-  var putLink = function(linkId, link, callback){
+  var putLink = function(linkId, link, callback) {
     db.multi()
-    .set(linkId, JSON.stringify(link))
-    .sadd('edges', linkId)
-    .exec(function(err){
-      if(callback){
-        callback(null, link);
-      }
-      else {
-        return link;
-      }
-    });
-  }
-
-  var createLink = function (fromId, toId, data, callback, linkId, fromNode, toNode) {
-
-    var link = new coreObjects.Link(fromId, toId, data, linkId);
-
-    if (!toNode){
-      throw new Error(JSON.stringify(arguments));
-    }
-
-    async.parallel([
-
-        function (cb2) {
-          putLink(linkId, link, cb2);
-        },
-        function (cb2) {
-          incrNumber('linksCount', cb2);
-        },
-        function (cb2) {
-          fromNode.links.push(link);
-          addNode(fromId, fromNode, cb2);
-        },
-        function (cb2) {
-          toNode.links.push(link);
-          addNode(toId, toNode, cb2);
-        }
-      ],
-      function (err) {
+      .set(linkId, JSON.stringify(link))
+      .sadd('edges', linkId)
+      .exec(function(err) {
         if (callback) {
           callback(null, link);
         } else {
@@ -318,50 +286,84 @@ module.exports = function (config) {
       });
   }
 
-  var addLink = function (fromId, toId, data, callback) {
+  var createLink = function(fromId, toId, data, callback, linkId, fromNode, toNode) {
+
+    var link = new coreObjects.Link(fromId, toId, data, linkId);
+
+    if (!toNode) {
+      throw new Error(JSON.stringify(arguments));
+    }
+
+    async.parallel([
+
+        function(cb2) {
+          putLink(linkId, link, cb2);
+        },
+        function(cb2) {
+          incrNumber('linksCount', cb2);
+        },
+        function(cb2) {
+          fromNode.links.push(link);
+          addNode(fromId, fromNode, cb2);
+        },
+        function(cb2) {
+          toNode.links.push(link);
+          addNode(toId, toNode, cb2);
+        }
+      ],
+      function(err) {
+        if (callback) {
+          callback(null, link);
+        } else {
+          return link;
+        }
+      });
+  }
+
+  var addLink = function(fromId, toId, data, callback) {
 
     var linkId = fromId + linkConnectionSymbol + toId;
 
     var mainArguments = Array.prototype.slice.call(arguments);
 
     //Add callback if not provided
-    if (!callback){
-      var fn = function(){};
+    if (!callback) {
+      var fn = function() {};
       mainArguments.push(fn)
     }
 
     async.parallel({
-      fromNode: function (next) {
+      fromNode: function(next) {
         addNode(fromId, null, next);
       },
-      toNode: function (next) {
+      toNode: function(next) {
         addNode(toId, null, next);
       },
-      edgeCount: function (next) {
+      edgeCount: function(next) {
 
-          async.waterfall([
+        async.waterfall([
 
-            function (cb) {
-              getNumber(linkId, cb);
-            },
-            function (value, cb) {
-              if (value == 0) {
-                putNumber(linkId, 1, cb);
-              } else {
-                incrNumber(linkId, cb);
-              }
+          function(cb) {
+            getNumber(linkId, cb);
+          },
+          function(value, cb) {
+            if (value == 0) {
+              putNumber(linkId, 1, cb);
+            } else {
+              incrNumber(linkId, cb);
             }
-          ], function (err, value) {
-            next(null, value);
-          })
+          }
+        ], function(err, value) {
+          next(null, value);
+        })
 
-        }
-        //,hasLink: function(next){
-        //  hasLink(fromId, toId, next);
-        //}
-    }, function (err, results) {
+      }
+      //,hasLink: function(next){
+      //  hasLink(fromId, toId, next);
+      //}
+    }, function(err, results) {
 
-      if (!results.toNode){
+      if (!results.toNode) {
         throw new Error(JSON.stringify(results));
       }
 
@@ -378,7 +380,7 @@ module.exports = function (config) {
 
   }
 
-  var removeNode = function (nodeId, callback) {
+  var removeNode = function(nodeId, callback) {
 
     function next(err, node) {
 
@@ -392,30 +394,30 @@ module.exports = function (config) {
 
       async.parallel([
 
-        function (cb) {
+        function(cb) {
           db.mulit()
             .del(link.id)
             .srem('nodes', nodeId)
-            .exec(function(err){
+            .exec(function(err) {
               cb();
             });
         },
-        function (cb) {
+        function(cb) {
           decrNumber('nodesCount', cb);
         },
-        function (cb) {
+        function(cb) {
 
           if (!node.links) {
             return cb();
           }
 
-          async.each(node.links, function (link, cb1) {
+          async.each(node.links, function(link, cb1) {
             removeLink(link, cb1);
-          }, function (err) {
+          }, function(err) {
             cb();
           });
         }
-      ], function (err) {
+      ], function(err) {
         if (callback) {
           callback(null, true);
         } else {
@@ -441,48 +443,46 @@ module.exports = function (config) {
 
     hasLink: hasLink,
 
-    getNodesCount: function (callback) {
+    getNodesCount: function(callback) {
       //var callback = function(err,value){
       //  return value;
       //}
       getNumber('nodesCount', callback);
     },
 
-    getLinksCount: function (callback) {
+    getLinksCount: function(callback) {
       //var callback = function(err,value){
       //  return value;
       //}
       getNumber('linksCount', callback);
     },
 
-    getLinks: function (nodeId, callback) {
+    getLinks: function(nodeId, callback) {
 
-      var cb = function (err, node) {
+      var cb = function(err, node) {
         var v = node ? node.links : null;
         callback(null, v);
       }
       getNode(nodeId, cb);
     },
 
-    forEachNode: function (callback) {
+    forEachNode: function(callback) {
       if (typeof callback !== 'function') {
-        if (callback){
+        if (callback) {
           callback(null, null);
-        }
-        else{
+        } else {
           return null;
-        }        
+        }
       }
 
-      db.smembers('nodes', function(err, arr){
+      db.smembers('nodes', function(err, arr) {
 
-        async.eachSeries(arr, function(nodeId, next){
-          
-          getNode(nodeId, function(err, node){
+        async.eachSeries(arr, function(nodeId, next) {
+
+          getNode(nodeId, function(err, node) {
             if (callback(node)) {
               return;
-            }
-            else {
+            } else {
               next(null, node);
             }
           });
@@ -491,9 +491,9 @@ module.exports = function (config) {
       });
     },
 
-    forEachLinkedNode: function (nodeId, callback, oriented) {
+    forEachLinkedNode: function(nodeId, callback, oriented) {
 
-      var next = function (err, node) {
+      var next = function(err, node) {
 
         var i,
           link,
@@ -506,7 +506,7 @@ module.exports = function (config) {
               link = node.links[i];
               if (link.fromId === nodeId) {
 
-                var cb = function (err, inNode) {
+                var cb = function(err, inNode) {
                   callback(inNode, link);
                 };
                 getNode(link.toId, cb);
@@ -519,7 +519,7 @@ module.exports = function (config) {
               link = node.links[i];
               linkedNodeId = link.fromId === nodeId ? link.toId : link.fromId;
 
-              var cb = function (err, linkedNode) {
+              var cb = function(err, linkedNode) {
                 callback(linkedNode, link);
               };
 
@@ -534,15 +534,15 @@ module.exports = function (config) {
 
     },
 
-    forEachLink: function (callback) {
+    forEachLink: function(callback) {
       var i, length;
       if (typeof callback === 'function') {
 
-        db.smembers('edges', function(err, arr){
+        db.smembers('edges', function(err, arr) {
 
-          async.eachSeries(arr, function(edgeId, next){
-            
-            getNode(edgeId, function(err, edge){
+          async.eachSeries(arr, function(edgeId, next) {
+
+            getNode(edgeId, function(err, edge) {
               callback(edge);
               next(null, edge);
             });
@@ -553,13 +553,12 @@ module.exports = function (config) {
       }
     },
 
-    clear: function (callback) {
+    clear: function(callback) {
 
-      db.flushdb(function(err){
-        if(callback){
+      db.flushdb(function(err) {
+        if (callback) {
           callback(null, true);
-        }
-        else{
+        } else {
           return true;
         }
       });
