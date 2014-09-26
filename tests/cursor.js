@@ -2,7 +2,6 @@ var graph = require('../index')();
 var shremlin = require('../lib/lmdb-shremlin-wrap');
 var g = shremlin(graph);
 
-
 //Get all vertices
 /***
 expect:
@@ -306,8 +305,6 @@ g.V('1')
   .forEach(function(err, path) {
     console.log(path);
   });
-
-
 
 /*
   Get all out edges for '1', expect:

@@ -13,7 +13,6 @@ for (var i = 0; i < count; i++) {
   });
 }
 
-
 //Create links
 for (var i = 0; i < count; i++) {
   for (var j = 0; j < 10; j++) {

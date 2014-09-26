@@ -49,7 +49,6 @@ describe('Setup graph', function() {
 
 });
 
-
 describe('Setup shremlin', function() {
 
   var graph = require('../index')();

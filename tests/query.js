@@ -32,8 +32,6 @@ graph.forEachOutLink(console.log);
 
 //graph.forEachNodeIndex(console.log);
 
-
-
 //var nodesCount = graph.getNodesCount(); //10
 //var linksCount = graph.getLinksCount(); //100
 

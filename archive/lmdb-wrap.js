@@ -514,7 +514,6 @@ module.exports = function(config) {
         return;
       }
 
-
       var it = vertexDb.iterator({
           keyAsBuffer: false,
           valueAsBuffer: false
