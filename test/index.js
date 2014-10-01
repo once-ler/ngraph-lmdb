@@ -234,3 +234,47 @@ describe('Test path', function() {
     });
 
 });
+
+describe('Test edge directions', function() {
+
+  var graph = require('../index')();
+  var shremlin = require('../lib/lmdb-shremlin-wrap');
+  var g = shremlin(graph);
+
+  describe('Get all out edges given a node id "1" and edge label "knows"', function() {
+    it('should have an id that starts with "1:knows"', function(done) {
+      g.V('1').outE('knows').forEach(function(err, d, index, cursor, txn){
+        if (err){
+          return(err);
+        }
+        d.should.be.an.Object.and.have.ownProperty('id').and.match(/^1:knows/i);        
+      });
+      done();      
+    });
+  });
+
+  describe('Get all in edges given a node id "1" and edge label "knows"', function() {
+    it('should have an id that ends with "knows:1"', function(done) {
+      g.V('1').inE('knows').forEach(function(err, d, index, cursor, txn){
+        if (err){
+          return(err);
+        }
+        d.should.be.an.Object.and.have.ownProperty('id').and.match(/knows:1$/i);        
+      });
+      done();      
+    });
+  });
+
+  describe('Get all both edges given a node id "1" and edge label "knows"', function() {
+    it('should have an id that begins with "1:knows" or ends with "knows:1"', function(done) {
+      g.V('1').bothE('knows').forEach(function(err, d, index, cursor, txn){
+        if (err){
+          return(err);
+        }
+        d.should.be.an.Object.and.have.ownProperty('id').and.match(/(^1:knows)|(knows:1$)/i);        
+      });
+      done();      
+    });
+  });
+
+});
