@@ -25,21 +25,44 @@ _At this stage of development, the following tests are already passing:_
      - [Get all out edges given a node id "1" and edge label "knows"](#test-edge-directions-get-all-out-edges-given-a-node-id-1-and-edge-label-knows)
      - [Get all in edges given a node id "1" and edge label "knows"](#test-edge-directions-get-all-in-edges-given-a-node-id-1-and-edge-label-knows)
      - [Get all both edges given a node id "1" and edge label "knows"](#test-edge-directions-get-all-both-edges-given-a-node-id-1-and-edge-label-knows)
-   - [Each item of the array is also an array with exactly 3 items](#each-item-of-the-array-is-also-an-array-with-exactly-3-items)
-   - [Inspect each item #1 of the path](#inspect-each-item-1-of-the-path)
-   - [Inspect each item #2 of the path](#inspect-each-item-2-of-the-path)
-   - [Inspect each item #3 of the path](#inspect-each-item-3-of-the-path)
 <a name=""></a>
  
 <a name="setup-graph"></a>
 # Setup graph
 <a name="setup-graph-add-10-nodes--10-links-per-node"></a>
 ## Add 10 nodes & 10 links per node
+
+```js
+/**
+  * @example
+  * // data passed ie { foo: 'bar' } will be indexed
+  * graph.addNode('1', { foo: 'bar' });
+  *
+  * // nodes '2' and '3' will be automatically generated if doesn't exist 
+  * graph.addLink('2', '3', 'knows');
+  */
+var count = 10;
+for (var i = 0; i < count; i++) {
+  graph.addNode(i + '', {
+    title: (i % 2 == 0 ? 'Even better' : 'Odd better')
+  });
+  for (var j = 0; j < 10; j++) {
+    var n = Math.floor((Math.random() * count));
+    var label = j % 2 == 0 ? 'likes' : 'studies';
+    label = j % 3 == 0 ? 'knows' : label;
+    graph.addLink(i + '', n + '', label);
+  }
+}
+```
 <a name="setup-graph-add-10-nodes--10-links-per-node-count-nodes"></a>
 ### Count nodes
 should be 10.
 
 ```js
+/**
+  * @example
+  * graph.getNodesCount();
+  */
 var nodesCount = graph.getNodesCount();
 nodesCount.should.be.exactly(10);
 done();
@@ -50,6 +73,10 @@ done();
 should be 100.
 
 ```js
+/**
+  * @example
+  * graph.getLinksCount();
+  */
 var linksCount = graph.getLinksCount();
 linksCount.should.be.exactly(100);
 done();
@@ -57,11 +84,24 @@ done();
 
 <a name="setup-shremlin"></a>
 # Setup shremlin
+
+```js
+var graph = require('../index')();
+var shremlin = require('../lib/lmdb-shremlin-wrap');
+var g = shremlin(graph);
+```
 <a name="setup-shremlin-get-all-vertices"></a>
 ## Get all vertices
 should get back 10 objects.
 
 ```js
+/**
+  * @example
+  * g.V()
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 var count = 0;
 g.V().forEach(function(err, d, index, cursor, txn) {
   if (err) {
@@ -82,20 +122,27 @@ done();
 should get an object with id == 0 and data object with key named "title".
 
 ```js
-function (
-      done) {
-      g.V('0').forEach(function(err, d, index, cursor, txn) {
-        if (err) {
-          return done(err);
-        }
-        if (!d) {
-          return done('Item is undefined or null');
-        }
-        d.should.be.an.Object.and.containEql({
-          id: '0'
-        }).and.have.ownProperty('data').and.have.ownProperty('title');
-      });
-      done();
+/**
+  * @example
+  * g.V('0')
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
+function (done) {
+  g.V('0').forEach(function(err, d, index, cursor, txn) {
+    if (err) {
+      return done(err);
+    }
+    if (!d) {
+      return done('Item is undefined or null');
+    }
+    d.should.be.an.Object.and.containEql({
+      id: '0'
+    }).and.have.ownProperty('data').and.have.ownProperty('title');
+  });
+  done();
+}
 ```
 
 <a name="setup-shremlin-get-all-nodes-with-title-containing-even"></a>
@@ -103,10 +150,15 @@ function (
 should get 5 objects with title == "even".
 
 ```js
+/**
+  * @example
+  * g.V({ title: 'even'})
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 var count = 0;
-g.V({
-  title: 'even'
-}).forEach(function(err, d, index, cursor, txn) {
+g.V({ title: 'even' }).forEach(function(err, d, index, cursor, txn) {
   if (err) {
     return done(err);
   }
@@ -126,10 +178,15 @@ done();
 should get 5 objects with title == "odd".
 
 ```js
+/**
+  * @example
+  * g.V({ title: 'odd'})
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 var count = 0;
-g.V({
-  title: 'odd'
-}).forEach(function(err, d, index, cursor, txn) {
+g.V({ title: 'odd' }).forEach(function(err, d, index, cursor, txn) {
   if (err) {
     return done(err);
   }
@@ -149,6 +206,14 @@ done();
 should get 4 objects with label == "knows".
 
 ```js
+/**
+  * @example
+  * g.V('0')
+  *  .outE('knows')
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 var count = 0;
 g.V('0').outE('knows').forEach(function(err, d, index, cursor, txn) {
   if (err) {
@@ -169,8 +234,16 @@ done();
 should get 3 objects with label == "knows".
 
 ```js
+/**
+  * @example
+  * g.V('1')
+  *  .inE('studies')
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 var count = 0;
-g.V('1').outE('studies').forEach(function(err, d, index, cursor, txn) {
+g.V('1').inE('studies').forEach(function(err, d, index, cursor, txn) {
   if (err) {
     return done(err);
   }
@@ -191,6 +264,16 @@ done();
 should get 3 sets of arrays..
 
 ```js
+/**
+  * @example
+  * g.V('2')
+  *  .outE('studies')
+  *  .inV()
+  *  .path()
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 var count = 0;
 g.V('2').outE('studies').inV().path().forEach(function(err, d, index, cursor, txn) {
   if (err) {
@@ -237,6 +320,14 @@ done();
 should have an id that starts with "1:knows".
 
 ```js
+/**
+  * @example
+  * g.V('1')
+  *  .outE('knows')
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 g.V('1').outE('knows').forEach(function(err, d, index, cursor, txn){
   if (err){
     return(err);
@@ -251,6 +342,14 @@ done();
 should have an id that ends with "knows:1".
 
 ```js
+/**
+  * @example
+  * g.V('1')
+  *  .inE('knows')
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 g.V('1').inE('knows').forEach(function(err, d, index, cursor, txn){
   if (err){
     return(err);
@@ -265,6 +364,14 @@ done();
 should have an id that begins with "1:knows" or ends with "knows:1".
 
 ```js
+/**
+  * @example
+  * g.V('1')
+  *  .bothE('knows')
+  *  .forEach(err, d) {
+  *   . . . 
+  *  });
+  */
 g.V('1').bothE('knows').forEach(function(err, d, index, cursor, txn){
   if (err){
     return(err);
@@ -274,87 +381,4 @@ g.V('1').bothE('knows').forEach(function(err, d, index, cursor, txn){
 done();
 ```
 
-<a name="each-item-of-the-array-is-also-an-array-with-exactly-3-items"></a>
-# Each item of the array is also an array with exactly 3 items
-should be an Array and have length == 3.
-
-```js
-d.should.be.an.Array.have.lengthOf(3);
-```
-
-<a name="inspect-each-item-1-of-the-path"></a>
-# Inspect each item #1 of the path
-should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item.
-
-```js
-d.should.match({
-                  '0': function(it) {
-                    it.should.be.an.Object.and.have.ownProperty('id').and.eql('2');
-                  },
-                  '1': function(it) {
-                    it.should.be.an.Object.and.have.properties(['fromId', 'toId']).and.have
-                      .ownProperty('label').and.match(/studies/);
-                  },
-                  '2': function(it) {
-                    it.should.be.an.Object.and.have.ownProperty('id');
-                  }
-                });
-                //done();
-```
-
-<a name="each-item-of-the-array-is-also-an-array-with-exactly-3-items"></a>
-# Each item of the array is also an array with exactly 3 items
-should be an Array and have length == 3.
-
-```js
-d.should.be.an.Array.have.lengthOf(3);
-```
-
-<a name="inspect-each-item-2-of-the-path"></a>
-# Inspect each item #2 of the path
-should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item.
-
-```js
-d.should.match({
-                  '0': function(it) {
-                    it.should.be.an.Object.and.have.ownProperty('id').and.eql('2');
-                  },
-                  '1': function(it) {
-                    it.should.be.an.Object.and.have.properties(['fromId', 'toId']).and.have
-                      .ownProperty('label').and.match(/studies/);
-                  },
-                  '2': function(it) {
-                    it.should.be.an.Object.and.have.ownProperty('id');
-                  }
-                });
-                //done();
-```
-
-<a name="each-item-of-the-array-is-also-an-array-with-exactly-3-items"></a>
-# Each item of the array is also an array with exactly 3 items
-should be an Array and have length == 3.
-
-```js
-d.should.be.an.Array.have.lengthOf(3);
-```
-
-<a name="inspect-each-item-3-of-the-path"></a>
-# Inspect each item #3 of the path
-should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item.
-
-```js
-d.should.match({
-                  '0': function(it) {
-                    it.should.be.an.Object.and.have.ownProperty('id').and.eql('2');
-                  },
-                  '1': function(it) {
-                    it.should.be.an.Object.and.have.properties(['fromId', 'toId']).and.have
-                      .ownProperty('label').and.match(/studies/);
-                  },
-                  '2': function(it) {
-                    it.should.be.an.Object.and.have.ownProperty('id');
-                  }
-                });
-                //done();
-```
 

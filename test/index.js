@@ -154,7 +154,7 @@ describe('Setup shremlin', function() {
   describe('Get all in edges labeled "studies" for one node', function() {
     it('should get 3 objects with label == "knows"', function(done) {
       var count = 0;
-      g.V('1').outE('studies').forEach(function(err, d, index, cursor, txn) {
+      g.V('1').inE('studies').forEach(function(err, d, index, cursor, txn) {
         if (err) {
           return done(err);
         }
@@ -202,7 +202,8 @@ describe('Test path', function() {
 
             it(
               'should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item',
-              function(done) {
+              //function(done) {
+              function() {
 
                 d.should.match({
                   '0': function(it) {
@@ -217,7 +218,7 @@ describe('Test path', function() {
                   }
                 });
 
-                done();
+                //done();
               });
 
           });
