@@ -290,6 +290,7 @@ g.V('1')
   { fromId: '4', toId: '8', id: '4:studies:8', label: 'studies' },
   { id: '8' } ]
 **/
+/*
 g.V('1')
   .outE('knows')
   .inV()
@@ -305,7 +306,7 @@ g.V('1')
   .forEach(function(err, path) {
     console.log(path);
   });
-
+*/
 /*
   Get all out edges for '1', expect:
 
@@ -322,6 +323,79 @@ g.V('1')
 
 g.V('1')
   .outE()
+  .forEach(function(err, d, index, cursor, txn) {
+    console.log(d);
+    if (index > 99){
+      cursor.close();
+      txn.abort();
+    }
+  });
+*/
+
+/**
+  Get in vertices of a node
+
+{ id: '1', data: { title: 'Odd better' } }
+{ id: '1', data: { title: 'Odd better' } }
+{ id: '2', data: { title: 'Even better' } }
+{ id: '4', data: { title: 'Even better' } }
+{ id: '4', data: { title: 'Even better' } }
+{ id: '4', data: { title: 'Even better' } }
+{ id: '5', data: { title: 'Odd better' } }
+{ id: '5', data: { title: 'Odd better' } }
+{ id: '6', data: { title: 'Even better' } }
+{ id: '7', data: { title: 'Odd better' } }
+{ id: '7', data: { title: 'Odd better' } }
+{ id: '8', data: { title: 'Even better' } }
+{ id: '9', data: { title: 'Odd better' } }
+{ id: '9', data: { title: 'Odd better' } }
+
+*/
+console.log('Get in vertices of node 3')
+g.V('3')
+  .in()
+  .forEach(function(err, d, index, cursor, txn) {
+    console.log(d);
+    if (index > 99){
+      cursor.close();
+      txn.abort();
+    }
+  });
+console.log('Get in edges of and then out vertices of node 3 (should be same as g.V(\'3\').in())')
+g.V('3')
+  .inE()
+  .outV()
+  .forEach(function(err, d, index, cursor, txn) {
+    console.log(d);
+    if (index > 99){
+      cursor.close();
+      txn.abort();
+    }
+  });
+
+/**
+  Get out vertices of a node
+
+{ id: '1', data: { title: 'Odd better' } }
+{ id: '1', data: { title: 'Odd better' } }
+{ id: '2', data: { title: 'Even better' } }
+{ id: '4', data: { title: 'Even better' } }
+{ id: '4', data: { title: 'Even better' } }
+{ id: '4', data: { title: 'Even better' } }
+{ id: '5', data: { title: 'Odd better' } }
+{ id: '5', data: { title: 'Odd better' } }
+{ id: '6', data: { title: 'Even better' } }
+{ id: '7', data: { title: 'Odd better' } }
+{ id: '7', data: { title: 'Odd better' } }
+{ id: '8', data: { title: 'Even better' } }
+{ id: '9', data: { title: 'Odd better' } }
+{ id: '9', data: { title: 'Odd better' } }
+
+*/
+/*
+console.log('Get out vertices of a node');
+g.V('3')
+  .out()
   .forEach(function(err, d, index, cursor, txn) {
     console.log(d);
     if (index > 99){
