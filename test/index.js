@@ -23,7 +23,9 @@ describe('Setup graph', function() {
           var n = Math.floor((Math.random() * count));
           var label = j % 2 == 0 ? 'likes' : 'studies';
           label = j % 3 == 0 ? 'knows' : label;
-          graph.addLink(i + '', n + '', label);
+          graph.addLink(i + '', n + '', label, {
+            color: (i % 2 == 0 ? 'green' : 'red')
+          });
         }
       }
       done();
