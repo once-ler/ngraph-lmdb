@@ -281,3 +281,19 @@ describe('Test edge directions', function() {
   });
 
 });
+
+describe('Get all edges with object property "color" and value "green"', function() {
+
+  it('Each edge should have a property "color" and value "green"', function(done) {
+
+    g.V().bothE({color:'green'}).forEach(function(err, d, index, cursor, txn){
+      if (err){
+        return(err);
+      }
+      d.should.be.an.Object.and.have.ownProperty('color').and.match(/green/i);        
+    });
+
+    done();
+  });
+
+});
