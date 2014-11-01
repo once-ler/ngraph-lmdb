@@ -9,7 +9,7 @@ _At this stage of development, the following tests are already passing:_
 
 ####Usage
 For now, if you want to perform CRUD operations, do the following:
-```bash
+```javascript
 NGRAPH_LMDB_HOME=/home/username/node_modules/ngraph-lmdb
 cd $NGRAPH_LMDB
 node
@@ -22,7 +22,7 @@ node
 ```
 
 To use the shremlin-like query API, do the following:
-```bash
+```javascript
 NGRAPH_LMDB_HOME=/home/username/node_modules/ngraph-lmdb
 cd $NGRAPH_LMDB
 node
