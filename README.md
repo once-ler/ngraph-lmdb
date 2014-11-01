@@ -7,6 +7,30 @@ Both are best of breed, why not combine the two?
 
 _At this stage of development, the following tests are already passing:_
 
+####Usage
+For now, if you want to perform CRUD operations, do the following:
+```bash
+NGRAPH_LMDB_HOME=/home/username/node_modules/ngraph-lmdb
+cd $NGRAPH_LMDB
+node
+> var graph = require('./index')();
+> graph.forEachNode(console.log);
+```
+
+To use the shremlin-like query API, do the following:
+```bash
+NGRAPH_LMDB_HOME=/home/username/node_modules/ngraph-lmdb
+cd $NGRAPH_LMDB
+node
+> var shremlin = require('./lib/lmdb-shremlin-wrap');
+> var g = shremlin();
+> g.V().forEach(function(err, d){ console.log(d); });
+```
+
+###Configuration
+```/lib/lmdb-config.js``` configures your lmdb instance.
+
+
 # TOC
    - [Setup graph](#setup-graph)
      - [Add 10 nodes & 10 links per node](#setup-graph-add-10-nodes--10-links-per-node)
