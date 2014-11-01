@@ -14,7 +14,11 @@ NGRAPH_LMDB_HOME=/home/username/node_modules/ngraph-lmdb
 cd $NGRAPH_LMDB
 node
 > var graph = require('./index')();
+> graph.addNode('jschmoe', {fullName: 'Joe Schmoe'});
+> graph.addNode('jdoe', {fullName: 'John Doe'});
+> graph.addLink('jschmoe','jdoe', 'knows',{ tag: 'New York City' });
 > graph.forEachNode(console.log);
+> graph.forEachLink(console.log);
 ```
 
 To use the shremlin-like query API, do the following:
