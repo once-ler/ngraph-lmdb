@@ -7,7 +7,7 @@ Both are best of breed, why not combine the two?
 
 _At this stage of development, the following tests are already passing:_
 
-####Usage
+###Usage
 For now, if you want to perform CRUD operations, do the following:
 ```javascript
 NGRAPH_LMDB_HOME=/home/username/node_modules/ngraph-lmdb
@@ -35,7 +35,76 @@ node
 
 ###Configuration
 ```/lib/lmdb-config.js``` configures your lmdb instance.
+The CRUD module and shremlin-like API uses the same configuration file.
 
+```javascript
+//lmdb defaults
+var lmdbConfig = {
+
+  appendOnly: false,
+
+  env: {
+    path: process.cwd() + "/mydata",
+    mapSize: 8 * 1024 * 1024 * 1024, // maximum database size
+    maxDbs: 10,
+    noMetaSync: true,
+    noSync: true
+  },
+
+  vertexDb: {
+    name: "test:vertices",
+    create: true // will create if database did not exist
+  },
+
+  edgeDb: {
+    name: "test:edges",
+    create: true
+  },
+
+  multiEdgesDb: {
+    name: "test:multi-edges",
+    create: true
+  },
+
+  bothEdgeDb: {
+    name: "test:both-edges",
+    create: true,
+    dupSort: true
+  },
+
+  inEdgeDb: {
+    name: "test:in-edges",
+    create: true,
+    dupSort: true
+  },
+
+  outEdgeDb: {
+    name: "test:out-edges",
+    create: true,
+    dupSort: true
+  },
+
+  statsDb: {
+    name: "test:stats",
+    create: true
+  },
+
+  indexVertexDb: {
+    name: "test:indexes-vertices",
+    create: true,
+    dupSort: true
+  },
+
+  indexEdgeDb: {
+    name: "test:indexes-edges",
+    create: true,
+    dupSort: true
+  }
+
+}
+
+module.exports = lmdbConfig;
+```
 
 # TOC
    - [Setup graph](#setup-graph)
