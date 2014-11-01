@@ -29,6 +29,8 @@ node
 > var shremlin = require('./lib/lmdb-shremlin-wrap');
 > var g = shremlin();
 > g.V().forEach(function(err, d){ console.log(d); });
+> g.V('jschmoe').outE('knows').forEach(function(err, d){ console.log(d); });
+> g.V('jschmoe').outE('knows').path().forEach(function(err, d){ console.log(d); });
 ```
 
 ###Configuration
