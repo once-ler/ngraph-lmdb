@@ -351,6 +351,7 @@ g.V('1')
 { id: '9', data: { title: 'Odd better' } }
 
 */
+/*
 console.log('Get in vertices of node 3')
 g.V('3')
   .in()
@@ -372,6 +373,7 @@ g.V('3')
       txn.abort();
     }
   });
+*/
 
 /**
   Get out vertices of a node
@@ -404,3 +406,8 @@ g.V('3')
     }
   });
 */
+
+console.log('Get edges with edge property "color" == "green"');
+g.V().bothE().forEach(function(err, d, index, cursor, txn){
+  console.log(err, d);       
+});

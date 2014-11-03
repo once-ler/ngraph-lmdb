@@ -192,18 +192,22 @@ describe('Test path', function() {
           if (!d) {
             return done('Item is undefined or null');
           }
-
+          /*
           describe('Each item of the array is also an array with exactly 3 items', function() {
 
             it('should be an Array and have length == 3', function() {
               d.should.be.an.Array.have.lengthOf(3);
             });
           });
+          */
 
           describe('Inspect each item #' + (count + 1) + ' of the path', function() {
 
-            it(
-              'should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item',
+            it('should be an Array and have length == 3', function() {
+              d.should.be.an.Array.have.lengthOf(3);
+            });
+
+            it('should contain itself as first item, contain an edge with label "studies" as second item, and an object for the third item',
               //function(done) {
               function() {
 
@@ -280,20 +284,17 @@ describe('Test edge directions', function() {
     });
   });
 
-});
+  describe('Get all edges with object property "color" and value "green"', function() {
+    it('Each edge should have a property "color" and value "green"', function(done) {
 
-describe('Get all edges with object property "color" and value "green"', function() {
-
-  it('Each edge should have a property "color" and value "green"', function(done) {
-
-    g.V().bothE({color:'green'}).forEach(function(err, d, index, cursor, txn){
-      if (err){
-        return(err);
-      }
-      d.should.be.an.Object.and.have.ownProperty('color').and.match(/green/i);        
+      g.V().bothE({color:'green'}).forEach(function(err, d, index, cursor, txn){
+        if (err){
+          return(err);
+        }
+        d.should.be.an.Object.and.have.ownProperty('color').and.match(/green/i);        
+      });
+      done();
     });
-
-    done();
   });
 
 });
